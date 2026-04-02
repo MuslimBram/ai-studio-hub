@@ -4,15 +4,20 @@ import { SearchBar } from '@/components/SearchBar';
 import { CategoryCard } from '@/components/CategoryCard';
 import { ToolSection } from '@/components/ToolSection';
 import { Navbar } from '@/components/Navbar';
-import { getAllCategories, getFeaturedTools, getPopularTools, getNewTools, getOfficialTools, searchTools } from '@/data/helpers';
 import { ToolCard } from '@/components/ToolCard';
-import { ArrowRight, Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Sparkles } from 'lucide-react';
+import { useCategories } from '@/hooks/useCategories';
+import { useTools, useSearchTools } from '@/hooks/useTools';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function Index() {
   const [query, setQuery] = useState('');
-  const categories = getAllCategories();
-  const searchResults = query.length > 1 ? searchTools(query) : [];
+  const { data: categories = [], isLoading: catsLoading } = useCategories();
+  const { data: searchResults = [] } = useSearchTools(query);
+  const { data: featuredTools = [] } = useTools({ featured: true });
+  const { data: popularTools = [] } = useTools({ popular: true });
+  const { data: newTools = [] } = useTools({ orderByCreated: true, limit: 8 });
+  const { data: officialTools = [] } = useTools({ official: true });
 
   return (
     <div className="min-h-screen bg-background">
@@ -67,22 +72,29 @@ export default function Index() {
               <div className="mb-6 flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-foreground">Kategoritë</h2>
               </div>
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {categories.map((cat) => (
-                  <CategoryCard key={cat.id} category={cat} />
-                ))}
-              </div>
+              {catsLoading ? (
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <Skeleton key={i} className="h-48 rounded-xl" />
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {categories.map((cat) => (
+                    <CategoryCard key={cat.id} category={cat} />
+                  ))}
+                </div>
+              )}
             </section>
 
-            <ToolSection title="⭐ Mjete të Veçanta" tools={getFeaturedTools()} />
-            <ToolSection title="🔥 Më Populloret" tools={getPopularTools()} />
-            <ToolSection title="🆕 Të Reja Këtë Javë" tools={getNewTools()} />
-            <ToolSection title="✅ Modele Zyrtare" tools={getOfficialTools()} />
+            <ToolSection title="⭐ Mjete të Veçanta" tools={featuredTools} />
+            <ToolSection title="🔥 Më Populloret" tools={popularTools} />
+            <ToolSection title="🆕 Të Reja Këtë Javë" tools={newTools} />
+            <ToolSection title="✅ Modele Zyrtare" tools={officialTools} />
           </>
         )}
       </main>
 
-      {/* Footer */}
       <footer className="border-t bg-card py-8">
         <div className="container text-center text-sm text-muted-foreground">
           © 2024 AI Tools Hub. Të gjitha të drejtat e rezervuara.

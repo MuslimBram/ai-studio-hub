@@ -1,4 +1,4 @@
-import { getAllProviders } from '@/data/helpers';
+import { useProviders } from '@/hooks/useTools';
 
 interface FilterSidebarProps {
   selectedPricing: string;
@@ -16,7 +16,7 @@ const pricingOptions = [
 ];
 
 export function FilterSidebar({ selectedPricing, onPricingChange, selectedProvider, onProviderChange }: FilterSidebarProps) {
-  const providers = getAllProviders();
+  const { data: providers = [] } = useProviders();
 
   return (
     <aside className="space-y-6">

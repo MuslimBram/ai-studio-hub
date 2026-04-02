@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Category } from '@/data/types';
 import { categoryIcons } from '@/data/icons';
-import { getSubcategoriesByCategoryId } from '@/data/helpers';
+import { useSubcategories } from '@/hooks/useCategories';
 
 interface CategoryCardProps {
   category: Category;
@@ -9,7 +9,7 @@ interface CategoryCardProps {
 
 export function CategoryCard({ category }: CategoryCardProps) {
   const Icon = categoryIcons[category.icon];
-  const subs = getSubcategoriesByCategoryId(category.id);
+  const { data: subs = [] } = useSubcategories(category.id);
 
   return (
     <Link
