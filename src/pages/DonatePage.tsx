@@ -110,6 +110,17 @@ export default function DonatePage() {
                 </Link>
               </div>
             )}
+
+            {/* Cancelled state */}
+            {status === 'cancelled' && (
+              <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-6 text-center">
+                <Heart className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+                <h3 className="text-lg font-bold text-foreground mb-1">Pagesa u anulua</h3>
+                <p className="text-muted-foreground">
+                  Nuk u bë asnjë pagesë. Mund të provoni përsëri kur të dëshironi.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
