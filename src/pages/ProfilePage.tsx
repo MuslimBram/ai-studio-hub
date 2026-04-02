@@ -83,7 +83,7 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
-      <div className="container py-12 max-w-lg">
+      <div className="container py-12 max-w-lg flex-1">
         <div className="flex items-center gap-3 mb-8">
           <h1 className="text-2xl font-bold text-foreground">Profili Im</h1>
           {isDonor && <DonorBadge totalDonated={totalDonated} size="md" />}
