@@ -52,9 +52,9 @@ export function ToolCard({ tool }: ToolCardProps) {
             <span className="text-xs text-muted-foreground">{tool.provider}</span>
             <span className={`text-xs font-medium ${pricingColors[tool.pricingType]}`}>{tool.pricingText}</span>
           </div>
-          <Button size="sm" variant="outline" className="text-xs">
-            Provo
-          </Button>
+          <span className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+            Shiko →
+          </span>
         </div>
       </div>
     </Link>

@@ -1,11 +1,12 @@
 import { useParams, Link } from 'react-router-dom';
 import { Navbar } from '@/components/Navbar';
 import { useToolBySlug } from '@/hooks/useTools';
-import { useCategoryBySlug, useSubcategoryBySlug } from '@/hooks/useCategories';
+import { useCategoryById, useSubcategoryById } from '@/hooks/useCategories';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ChevronRight, ExternalLink, Sparkles, Star, Award, Shield, CheckCircle } from 'lucide-react';
+import { ChevronRight, ExternalLink, Sparkles, Star, Award, Shield, CheckCircle, Clock } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 const badgeConfig: Record<string, { label: string; icon: React.ReactNode }> = {
   new: { label: 'I ri', icon: <Sparkles className="h-3 w-3" /> },
@@ -17,10 +18,22 @@ const badgeConfig: Record<string, { label: string; icon: React.ReactNode }> = {
 export default function ToolPage() {
   const { toolSlug } = useParams<{ toolSlug: string }>();
   const { data: tool, isLoading } = useToolBySlug(toolSlug || '');
-  const { data: category } = useCategoryBySlug(tool?.categoryId ? '' : '');
-  
-  // We need category data based on tool's categoryId - use a separate approach
-  const categorySlug = tool?.categoryId || '';
+  const { data: category } = useCategoryById(tool?.categoryId);
+  const { data: subcategory } = useSubcategoryById(tool?.subcategoryId);
+
+  const handleTryNow = () => {
+    toast({
+      title: 'Së shpejti!',
+      description: `Integrimi me ${tool?.provider || 'këtë mjet'} do të jetë i disponueshëm së shpejti.`,
+    });
+  };
+
+  const handleLearnMore = () => {
+    toast({
+      title: 'Së shpejti!',
+      description: 'Dokumentacioni i detajuar do të shtohet së shpejti.',
+    });
+  };
 
   if (isLoading) {
     return (
@@ -57,7 +70,17 @@ export default function ToolPage() {
         <nav className="flex items-center gap-2 text-sm text-muted-foreground">
           <Link to="/" className="hover:text-foreground transition-colors">Kryefaqja</Link>
           <ChevronRight className="h-3 w-3" />
-          <Link to={`/tools/${tool.categoryId}`} className="hover:text-foreground transition-colors">{tool.categoryId}</Link>
+          {category ? (
+            <Link to={`/tools/${category.slug}`} className="hover:text-foreground transition-colors">{category.name}</Link>
+          ) : (
+            <Skeleton className="h-4 w-16" />
+          )}
+          {subcategory && (
+            <>
+              <ChevronRight className="h-3 w-3" />
+              <Link to={`/tools/${category?.slug}/${subcategory.slug}`} className="hover:text-foreground transition-colors">{subcategory.name}</Link>
+            </>
+          )}
           <ChevronRight className="h-3 w-3" />
           <span className="text-foreground font-medium">{tool.title}</span>
         </nav>
@@ -155,11 +178,11 @@ export default function ToolPage() {
                   <div className="text-xl font-bold text-foreground">{tool.pricingText}</div>
                   <span className="text-xs text-muted-foreground capitalize">{tool.pricingType}</span>
                 </div>
-                <Button className="w-full mb-3" size="lg">
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Provo Tani
+                <Button className="w-full mb-3" size="lg" onClick={handleTryNow}>
+                  <Clock className="h-4 w-4 mr-2" />
+                  Së Shpejti
                 </Button>
-                <Button variant="outline" className="w-full" size="lg">
+                <Button variant="outline" className="w-full" size="lg" onClick={handleLearnMore}>
                   <ExternalLink className="h-4 w-4 mr-2" />
                   Mëso Më Shumë
                 </Button>
@@ -173,6 +196,14 @@ export default function ToolPage() {
                 <div>
                   <span className="text-xs text-muted-foreground">Model</span>
                   <div className="text-sm font-medium text-foreground">{tool.modelType}</div>
+                </div>
+                <div>
+                  <span className="text-xs text-muted-foreground">Kategoria</span>
+                  <div className="text-sm font-medium text-foreground">{category?.name || '...'}</div>
+                </div>
+                <div>
+                  <span className="text-xs text-muted-foreground">Nënkategoria</span>
+                  <div className="text-sm font-medium text-foreground">{subcategory?.name || '...'}</div>
                 </div>
                 <div>
                   <span className="text-xs text-muted-foreground">Shtuar më</span>

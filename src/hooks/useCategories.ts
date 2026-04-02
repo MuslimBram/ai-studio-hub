@@ -49,6 +49,40 @@ export function useSubcategories(categoryId?: string) {
   });
 }
 
+export function useCategoryById(id?: string) {
+  return useQuery({
+    queryKey: ['category-by-id', id],
+    queryFn: async (): Promise<Category | null> => {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('id', id!)
+        .maybeSingle();
+      if (error) throw error;
+      return data ? mapCategory(data) : null;
+    },
+    enabled: !!id,
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useSubcategoryById(id?: string) {
+  return useQuery({
+    queryKey: ['subcategory-by-id', id],
+    queryFn: async (): Promise<Subcategory | null> => {
+      const { data, error } = await supabase
+        .from('subcategories')
+        .select('*')
+        .eq('id', id!)
+        .maybeSingle();
+      if (error) throw error;
+      return data ? mapSubcategory(data) : null;
+    },
+    enabled: !!id,
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
 export function useSubcategoryBySlug(categorySlug: string, subSlug: string) {
   const { data: category } = useCategoryBySlug(categorySlug);
   
