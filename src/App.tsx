@@ -4,6 +4,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { MfaGuard } from "@/components/MfaGuard";
+import { ForceLogoutProvider } from "@/components/ForceLogoutProvider";
 import Index from "./pages/Index";
 import CategoryPage from "./pages/CategoryPage";
 import SubcategoryPage from "./pages/SubcategoryPage";
@@ -30,7 +32,9 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <ForceLogoutProvider />
           <Routes>
+            {/* Public routes */}
             <Route path="/" element={<Index />} />
             <Route path="/tools/:categorySlug" element={<CategoryPage />} />
             <Route path="/tools/:categorySlug/:subcategorySlug" element={<SubcategoryPage />} />
@@ -39,13 +43,16 @@ const App = () => (
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
             <Route path="/donate" element={<DonatePage />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/tools" element={<AdminTools />} />
-            <Route path="/admin/categories" element={<AdminCategories />} />
-            <Route path="/admin/donations" element={<AdminDonations />} />
-            <Route path="/admin/users" element={<AdminUsers />} />
+
+            {/* Protected routes — require 2FA */}
+            <Route path="/profile" element={<MfaGuard><ProfilePage /></MfaGuard>} />
+            <Route path="/admin" element={<MfaGuard><AdminDashboard /></MfaGuard>} />
+            <Route path="/admin/tools" element={<MfaGuard><AdminTools /></MfaGuard>} />
+            <Route path="/admin/categories" element={<MfaGuard><AdminCategories /></MfaGuard>} />
+            <Route path="/admin/donations" element={<MfaGuard><AdminDonations /></MfaGuard>} />
+            <Route path="/admin/users" element={<MfaGuard><AdminUsers /></MfaGuard>} />
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

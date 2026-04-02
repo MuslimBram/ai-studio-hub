@@ -2,6 +2,9 @@ import { corsHeaders } from '@supabase/supabase-js/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { z } from 'npm:zod@3';
 
+// PayPal LIVE environment
+// Change to 'https://api-m.sandbox.paypal.com' for sandbox testing
+
 const PAYPAL_API = 'https://api-m.paypal.com';
 
 const BodySchema = z.object({

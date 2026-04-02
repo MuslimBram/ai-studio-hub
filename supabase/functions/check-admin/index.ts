@@ -1,6 +1,8 @@
 import { corsHeaders } from '@supabase/supabase-js/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
+const OWNER_EMAIL = 'amirah.br0006@gmail.com';
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -16,7 +18,7 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_PUBLISHABLE_KEY')!,
+      Deno.env.get('SUPABASE_ANON_KEY')!,
       { global: { headers: { authorization: authHeader } } }
     );
 
@@ -27,7 +29,23 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Use service role to check role (bypasses RLS)
+    // Hardcoded owner fallback — always admin regardless of DB state
+    if (user.email === OWNER_EMAIL) {
+      // Ensure DB role exists too (self-healing)
+      const supabaseAdmin = createClient(
+        Deno.env.get('SUPABASE_URL')!,
+        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+      );
+      await supabaseAdmin
+        .from('user_roles')
+        .upsert({ user_id: user.id, role: 'admin' }, { onConflict: 'user_id,role' });
+
+      return new Response(JSON.stringify({ isAdmin: true }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Check DB for other admins
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
