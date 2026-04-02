@@ -1,7 +1,9 @@
 import { Tool } from './types';
 
 export const tools: Tool[] = [
+  // ═══════════════════════════════════════════
   // IMAGE - Text to Image
+  // ═══════════════════════════════════════════
   {
     id: 'flux-pro',
     title: 'FLUX.1 Pro',
@@ -78,7 +80,63 @@ export const tools: Tool[] = [
     useCases: ['Art gjenerativ', 'Prototip dizajni', 'Concept art', 'Personalizim me LoRA'],
   },
 
+  // ═══════════════════════════════════════════
+  // IMAGE - Image to Image
+  // ═══════════════════════════════════════════
+  {
+    id: 'img2img-sdxl',
+    title: 'SDXL Image-to-Image',
+    slug: 'img2img-sdxl',
+    shortDescription: 'Transformo imazhe ekzistuese me stil të ri',
+    fullDescription: 'Përdor modelin SDXL për të transformuar imazhe ekzistuese duke ndryshuar stilin, ngjyrat, ose elementet vizuale ndërsa ruan kompozicionin bazë.',
+    categoryId: 'image',
+    subcategoryId: 'image-to-image',
+    provider: 'Replicate',
+    modelType: 'Diffusion',
+    imageUrl: '',
+    badge: 'popular',
+    pricingType: 'freemium',
+    pricingText: 'Nga $0.03/imazh',
+    isFeatured: false,
+    isOfficial: true,
+    isPopular: true,
+    createdAt: '2024-01-20',
+    features: ['Style transfer', 'Strength control', 'Inpainting', 'Outpainting'],
+    examples: [],
+    tags: ['image-to-image', 'style-transfer', 'editing'],
+    inputTypes: ['Image', 'Text'],
+    outputTypes: ['Image'],
+    useCases: ['Ndryshim stili', 'Restaurim imazhesh', 'Dizajn iterativ', 'Fotografi artistike'],
+  },
+  {
+    id: 'controlnet-pro',
+    title: 'ControlNet Pro',
+    slug: 'controlnet-pro',
+    shortDescription: 'Kontroll preciz mbi gjenerimin e imazheve',
+    fullDescription: 'ControlNet Pro ofron kontroll preciz mbi gjenerimin e imazheve duke përdorur harta thellësie, skica, poza, dhe shumë më tepër.',
+    categoryId: 'image',
+    subcategoryId: 'image-to-image',
+    provider: 'fal.ai',
+    modelType: 'ControlNet',
+    imageUrl: '',
+    badge: 'featured',
+    pricingType: 'paid',
+    pricingText: 'Nga $0.04/imazh',
+    isFeatured: true,
+    isOfficial: false,
+    isPopular: false,
+    createdAt: '2024-05-10',
+    features: ['Depth maps', 'Pose detection', 'Edge detection', 'Scribble mode'],
+    examples: [],
+    tags: ['controlnet', 'precise', 'pose', 'depth'],
+    inputTypes: ['Image', 'Text'],
+    outputTypes: ['Image'],
+    useCases: ['Dizajn i kontrolluar', 'Poza specifike', 'Arkitekturë', 'Fashion design'],
+  },
+
+  // ═══════════════════════════════════════════
   // IMAGE - Background Removal
+  // ═══════════════════════════════════════════
   {
     id: 'bg-removal-pro',
     title: 'BG Removal Pro',
@@ -105,7 +163,9 @@ export const tools: Tool[] = [
     useCases: ['E-commerce', 'Fotografi produktesh', 'Dizajn grafik', 'Social media'],
   },
 
+  // ═══════════════════════════════════════════
   // IMAGE - Upscale
+  // ═══════════════════════════════════════════
   {
     id: 'real-esrgan',
     title: 'Real-ESRGAN',
@@ -131,7 +191,66 @@ export const tools: Tool[] = [
     useCases: ['Fotografi e vjetër', 'Print preparation', 'Zoom enhancement'],
   },
 
+  // ═══════════════════════════════════════════
+  // IMAGE - Face Restore
+  // ═══════════════════════════════════════════
+  {
+    id: 'face-restore-ai',
+    title: 'Face Restore AI',
+    slug: 'face-restore-ai',
+    shortDescription: 'Rikthe cilësinë e fytyrave në foto të vjetra ose blur',
+    fullDescription: 'Face Restore AI përdor modele të specializuara për të rikthyer detajet e fytyrave në imazhe me cilësi të ulët, blur, ose të dëmtuara.',
+    categoryId: 'image',
+    subcategoryId: 'face-restore',
+    provider: 'Replicate',
+    modelType: 'Restoration',
+    imageUrl: '',
+    pricingType: 'free',
+    pricingText: 'Falas',
+    isFeatured: false,
+    isOfficial: true,
+    isPopular: false,
+    createdAt: '2023-11-01',
+    features: ['Old photo restoration', 'Blur fix', 'Detail enhancement', 'Batch support'],
+    examples: [],
+    tags: ['face', 'restore', 'enhance', 'old-photos'],
+    inputTypes: ['Image'],
+    outputTypes: ['Image'],
+    useCases: ['Foto familjare', 'Restaurim fotografik', 'Headshot enhancement'],
+  },
+
+  // ═══════════════════════════════════════════
+  // IMAGE - Product Mockup
+  // ═══════════════════════════════════════════
+  {
+    id: 'mockup-studio',
+    title: 'Mockup Studio AI',
+    slug: 'mockup-studio',
+    shortDescription: 'Krijo mockup-e profesionale produktesh me AI',
+    fullDescription: 'Mockup Studio AI gjeneron automatikisht mockup-e fotorealistike për produkte si t-shirts, mug-e, telefona, dhe shumë më tepër. Vendos dizajnin tënd dhe merr mockup të gatshëm.',
+    categoryId: 'image',
+    subcategoryId: 'product-mockup',
+    provider: 'fal.ai',
+    modelType: 'Compositing',
+    imageUrl: '',
+    badge: 'new',
+    pricingType: 'freemium',
+    pricingText: 'Falas deri 20/muaj',
+    isFeatured: false,
+    isOfficial: false,
+    isPopular: false,
+    createdAt: '2024-10-05',
+    features: ['100+ templates', 'Auto-placement', 'Shadow & lighting', 'Batch export'],
+    examples: [],
+    tags: ['mockup', 'product', 'e-commerce', 'design'],
+    inputTypes: ['Image', 'Text'],
+    outputTypes: ['Image'],
+    useCases: ['E-commerce listings', 'Brand presentations', 'Social media ads', 'Print-on-demand'],
+  },
+
+  // ═══════════════════════════════════════════
   // VIDEO - Text to Video
+  // ═══════════════════════════════════════════
   {
     id: 'kling-video',
     title: 'Kling AI Video',
@@ -183,7 +302,9 @@ export const tools: Tool[] = [
     useCases: ['Film clips', 'Ads', 'Music videos', 'Content creation'],
   },
 
+  // ═══════════════════════════════════════════
   // VIDEO - Image to Video
+  // ═══════════════════════════════════════════
   {
     id: 'animate-diff',
     title: 'AnimateDiff',
@@ -209,7 +330,95 @@ export const tools: Tool[] = [
     useCases: ['Social media', 'Prezantime', 'Art', 'NFT'],
   },
 
+  // ═══════════════════════════════════════════
+  // VIDEO - Lip Sync
+  // ═══════════════════════════════════════════
+  {
+    id: 'lip-sync-ai',
+    title: 'Lip Sync AI',
+    slug: 'lip-sync-ai',
+    shortDescription: 'Sinkronizo buzët e personazheve me çdo audio',
+    fullDescription: 'Lip Sync AI merr një video fyture dhe një audio file, dhe sinkronizon lëvizjet e buzëve me audio-n. Ideal për dubbing dhe content creation.',
+    categoryId: 'video',
+    subcategoryId: 'lip-sync',
+    provider: 'fal.ai',
+    modelType: 'Lip Sync',
+    imageUrl: '',
+    pricingType: 'paid',
+    pricingText: 'Nga $0.20/video',
+    isFeatured: false,
+    isOfficial: false,
+    isPopular: false,
+    createdAt: '2024-09-01',
+    features: ['Multi-language', 'Realistic sync', 'Emotion mapping', 'API access'],
+    examples: [],
+    tags: ['lip-sync', 'dubbing', 'video-editing'],
+    inputTypes: ['Video', 'Audio'],
+    outputTypes: ['Video'],
+    useCases: ['Dubbing', 'Content creation', 'Marketing videos', 'Education'],
+  },
+
+  // ═══════════════════════════════════════════
+  // VIDEO - Video Upscale
+  // ═══════════════════════════════════════════
+  {
+    id: 'video-upscaler',
+    title: 'Video Upscaler AI',
+    slug: 'video-upscaler',
+    shortDescription: 'Rrit cilësinë e videos deri në 4K',
+    fullDescription: 'Video Upscaler AI rrit rezolucionin e videove të vjetra ose me cilësi të ulët deri në 4K. Përmirëson detajet, ul zhurmën, dhe stabilizon kadrat.',
+    categoryId: 'video',
+    subcategoryId: 'video-upscale',
+    provider: 'Replicate',
+    modelType: 'Super Resolution',
+    imageUrl: '',
+    badge: 'popular',
+    pricingType: 'paid',
+    pricingText: 'Nga $0.30/minutë',
+    isFeatured: false,
+    isOfficial: true,
+    isPopular: true,
+    createdAt: '2024-04-15',
+    features: ['Deri 4K upscale', 'Noise reduction', 'Frame interpolation', 'Stabilization'],
+    examples: [],
+    tags: ['video-upscale', 'enhance', '4k', 'restore'],
+    inputTypes: ['Video'],
+    outputTypes: ['Video'],
+    useCases: ['Video të vjetra', 'YouTube content', 'Arkiv filmash', 'Surveillance footage'],
+  },
+
+  // ═══════════════════════════════════════════
+  // VIDEO - Video Avatar
+  // ═══════════════════════════════════════════
+  {
+    id: 'heygen-avatar',
+    title: 'HeyGen Avatar',
+    slug: 'heygen-avatar',
+    shortDescription: 'Krijo avatar video realistike që flasin',
+    fullDescription: 'HeyGen Avatar krijon video me avatar realistike që flasin në çdo gjuhë. Ideal për trajnime, marketing, dhe prezantime pa nevojë për kamerë.',
+    categoryId: 'video',
+    subcategoryId: 'video-avatar',
+    provider: 'Custom',
+    modelType: 'Avatar Generation',
+    imageUrl: '',
+    badge: 'featured',
+    pricingType: 'paid',
+    pricingText: 'Nga $24/muaj',
+    isFeatured: true,
+    isOfficial: false,
+    isPopular: true,
+    createdAt: '2024-06-20',
+    features: ['100+ avatar', '40+ gjuhë', 'Custom avatar', 'Script editor'],
+    examples: [],
+    tags: ['avatar', 'talking-head', 'presenter', 'training'],
+    inputTypes: ['Text', 'Audio'],
+    outputTypes: ['Video'],
+    useCases: ['Trajnime', 'Marketing videos', 'Prezantime', 'Customer onboarding'],
+  },
+
+  // ═══════════════════════════════════════════
   // AUDIO - Text to Speech
+  // ═══════════════════════════════════════════
   {
     id: 'elevenlabs-tts',
     title: 'ElevenLabs TTS',
@@ -236,7 +445,9 @@ export const tools: Tool[] = [
     useCases: ['Audiobooks', 'Podcasts', 'Video voiceover', 'Accessibility'],
   },
 
+  // ═══════════════════════════════════════════
   // AUDIO - Voice Clone
+  // ═══════════════════════════════════════════
   {
     id: 'voice-clone-pro',
     title: 'Voice Clone Pro',
@@ -263,7 +474,9 @@ export const tools: Tool[] = [
     useCases: ['Personal assistant', 'Voiceover', 'Brand voice', 'Accessibility'],
   },
 
+  // ═══════════════════════════════════════════
   // AUDIO - Music
+  // ═══════════════════════════════════════════
   {
     id: 'suno-music',
     title: 'Suno Music AI',
@@ -290,7 +503,38 @@ export const tools: Tool[] = [
     useCases: ['Muzikë origjinale', 'Jingle reklamash', 'Soundtrack', 'Content creation'],
   },
 
+  // ═══════════════════════════════════════════
+  // AUDIO - Sound FX
+  // ═══════════════════════════════════════════
+  {
+    id: 'soundfx-ai',
+    title: 'SoundFX AI',
+    slug: 'soundfx-ai',
+    shortDescription: 'Gjenero efekte zanore realistike nga teksti',
+    fullDescription: 'SoundFX AI krijon efekte zanore të çdo lloji nga një përshkrim tekstual. Nga zhurma e shiut te eksplodime, çdo tingull mund të gjenerohet me AI.',
+    categoryId: 'audio',
+    subcategoryId: 'sound-fx',
+    provider: 'Replicate',
+    modelType: 'Audio Generation',
+    imageUrl: '',
+    badge: 'new',
+    pricingType: 'freemium',
+    pricingText: 'Falas deri 30/muaj',
+    isFeatured: false,
+    isOfficial: false,
+    isPopular: false,
+    createdAt: '2024-09-10',
+    features: ['Text-to-SFX', 'Realistic sounds', 'Loop option', 'WAV/MP3 export'],
+    examples: [],
+    tags: ['sound-fx', 'effects', 'audio', 'foley'],
+    inputTypes: ['Text'],
+    outputTypes: ['Audio'],
+    useCases: ['Lojra', 'Video editing', 'Podcasts', 'Film production'],
+  },
+
+  // ═══════════════════════════════════════════
   // TEXT - AI Writing
+  // ═══════════════════════════════════════════
   {
     id: 'ai-writer-pro',
     title: 'AI Writer Pro',
@@ -317,7 +561,66 @@ export const tools: Tool[] = [
     useCases: ['Blog posts', 'Articles', 'Marketing copy', 'Product descriptions'],
   },
 
+  // ═══════════════════════════════════════════
+  // TEXT - Summarizer
+  // ═══════════════════════════════════════════
+  {
+    id: 'summary-ai',
+    title: 'Summary AI',
+    slug: 'summary-ai',
+    shortDescription: 'Përmbledh dokumente, artikuj dhe tekste të gjata',
+    fullDescription: 'Summary AI kondenzon tekste të gjata në përmbledhje koncize. Mbështet PDF, URL, dhe tekst direkt. Kontrollon gjatësinë dhe stilin e output-it.',
+    categoryId: 'text',
+    subcategoryId: 'summarizer',
+    provider: 'Custom',
+    modelType: 'LLM',
+    imageUrl: '',
+    pricingType: 'free',
+    pricingText: 'Falas',
+    isFeatured: false,
+    isOfficial: false,
+    isPopular: true,
+    createdAt: '2024-03-01',
+    features: ['PDF support', 'URL import', 'Length control', 'Key points extraction'],
+    examples: [],
+    tags: ['summary', 'document', 'research'],
+    inputTypes: ['Text', 'PDF', 'URL'],
+    outputTypes: ['Text'],
+    useCases: ['Kërkim akademik', 'News digest', 'Meeting notes', 'Dokumente ligjore'],
+  },
+
+  // ═══════════════════════════════════════════
+  // TEXT - Translator
+  // ═══════════════════════════════════════════
+  {
+    id: 'translate-ai',
+    title: 'Translate AI Pro',
+    slug: 'translate-ai',
+    shortDescription: 'Përkthe tekste në 100+ gjuhë me saktësi të lartë',
+    fullDescription: 'Translate AI Pro ofron përkthime profesionale me AI në mbi 100 gjuhë. Ruan kontekstin, tonin, dhe terminologjinë e fushës.',
+    categoryId: 'text',
+    subcategoryId: 'translator',
+    provider: 'Custom',
+    modelType: 'LLM',
+    imageUrl: '',
+    badge: 'popular',
+    pricingType: 'freemium',
+    pricingText: 'Falas deri 10k fjalë/muaj',
+    isFeatured: false,
+    isOfficial: false,
+    isPopular: true,
+    createdAt: '2024-04-01',
+    features: ['100+ gjuhë', 'Kontekst i saktë', 'Document upload', 'Glossary support'],
+    examples: [],
+    tags: ['translation', 'multilingual', 'localization'],
+    inputTypes: ['Text', 'PDF'],
+    outputTypes: ['Text'],
+    useCases: ['Lokalizim website', 'Dokumente biznesi', 'Përkthim akademik', 'Komunikim ndërkombëtar'],
+  },
+
+  // ═══════════════════════════════════════════
   // TEXT - Chatbot
+  // ═══════════════════════════════════════════
   {
     id: 'smart-chatbot',
     title: 'Smart Chatbot',
@@ -343,7 +646,9 @@ export const tools: Tool[] = [
     useCases: ['Customer support', 'FAQ', 'Lead generation', 'Onboarding'],
   },
 
+  // ═══════════════════════════════════════════
   // GAMES - NPC Dialogue
+  // ═══════════════════════════════════════════
   {
     id: 'npc-dialog-engine',
     title: 'NPC Dialog Engine',
@@ -370,7 +675,66 @@ export const tools: Tool[] = [
     useCases: ['RPG games', 'Adventure games', 'Interactive fiction'],
   },
 
+  // ═══════════════════════════════════════════
+  // GAMES - Story Generator
+  // ═══════════════════════════════════════════
+  {
+    id: 'story-forge',
+    title: 'Story Forge AI',
+    slug: 'story-forge',
+    shortDescription: 'Gjenero tregime dhe narrativa për lojra e media',
+    fullDescription: 'Story Forge AI krijon tregime, arke narrative, dialogë, dhe quest-e për lojra dhe media interaktive. Mbështet shumë gjindje dhe stile.',
+    categoryId: 'games',
+    subcategoryId: 'story-generator',
+    provider: 'Custom',
+    modelType: 'LLM',
+    imageUrl: '',
+    badge: 'featured',
+    pricingType: 'freemium',
+    pricingText: 'Falas deri 10 tregime/muaj',
+    isFeatured: false,
+    isOfficial: false,
+    isPopular: false,
+    createdAt: '2024-08-10',
+    features: ['Story arcs', 'Character builder', 'Quest generator', 'Branching paths'],
+    examples: [],
+    tags: ['story', 'narrative', 'game-writing', 'quest'],
+    inputTypes: ['Text'],
+    outputTypes: ['Text'],
+    useCases: ['Lojra RPG', 'Interactive fiction', 'Screenplay', 'World-building'],
+  },
+
+  // ═══════════════════════════════════════════
+  // GAMES - Asset Generator
+  // ═══════════════════════════════════════════
+  {
+    id: 'game-asset-gen',
+    title: 'Game Asset Generator',
+    slug: 'game-asset-gen',
+    shortDescription: 'Krijo asset-e 2D/3D për lojra me AI',
+    fullDescription: 'Game Asset Generator krijon sprites, tekstura, ikona, dhe asset-e të tjera vizuale për lojra. Mbështet stile pixel art, low-poly, dhe realistike.',
+    categoryId: 'games',
+    subcategoryId: 'asset-generator',
+    provider: 'Replicate',
+    modelType: 'Diffusion',
+    imageUrl: '',
+    pricingType: 'freemium',
+    pricingText: 'Nga $0.05/asset',
+    isFeatured: false,
+    isOfficial: false,
+    isPopular: false,
+    createdAt: '2024-07-20',
+    features: ['Pixel art', 'Sprite sheets', 'Texture maps', 'Tileable outputs'],
+    examples: [],
+    tags: ['game-assets', 'sprites', 'textures', 'pixel-art'],
+    inputTypes: ['Text', 'Image'],
+    outputTypes: ['Image'],
+    useCases: ['Indie games', 'Game jams', 'Prototipe', 'Mobile games'],
+  },
+
+  // ═══════════════════════════════════════════
   // GAMES - Game Concept Art
+  // ═══════════════════════════════════════════
   {
     id: 'game-art-ai',
     title: 'Game Art AI',
@@ -396,7 +760,9 @@ export const tools: Tool[] = [
     useCases: ['Game prototyping', 'Concept art', 'Asset creation'],
   },
 
+  // ═══════════════════════════════════════════
   // BUSINESS - Ads Generator
+  // ═══════════════════════════════════════════
   {
     id: 'ad-creator-ai',
     title: 'Ad Creator AI',
@@ -423,7 +789,38 @@ export const tools: Tool[] = [
     useCases: ['Facebook Ads', 'Google Ads', 'TikTok Ads', 'Instagram'],
   },
 
+  // ═══════════════════════════════════════════
+  // BUSINESS - Product Description
+  // ═══════════════════════════════════════════
+  {
+    id: 'product-desc-ai',
+    title: 'Product Desc AI',
+    slug: 'product-desc-ai',
+    shortDescription: 'Shkruaj përshkrime produktesh që shesin',
+    fullDescription: 'Product Desc AI gjeneron përshkrime produktesh të optimizuara për SEO dhe konversion. Mbështet shumë formate dhe platforma e-commerce.',
+    categoryId: 'business',
+    subcategoryId: 'product-description',
+    provider: 'Custom',
+    modelType: 'LLM',
+    imageUrl: '',
+    badge: 'popular',
+    pricingType: 'freemium',
+    pricingText: 'Falas deri 50/muaj',
+    isFeatured: false,
+    isOfficial: false,
+    isPopular: true,
+    createdAt: '2024-05-15',
+    features: ['SEO-optimized', 'Bullet points', 'A+ content', 'Multi-platform'],
+    examples: [],
+    tags: ['product', 'e-commerce', 'copywriting', 'seo'],
+    inputTypes: ['Text', 'Image'],
+    outputTypes: ['Text'],
+    useCases: ['Amazon listings', 'Shopify products', 'eBay listings', 'Katalog produkte'],
+  },
+
+  // ═══════════════════════════════════════════
   // BUSINESS - Email Writer
+  // ═══════════════════════════════════════════
   {
     id: 'email-ai-writer',
     title: 'Email AI Writer',
@@ -449,81 +846,32 @@ export const tools: Tool[] = [
     useCases: ['Cold outreach', 'Marketing campaigns', 'Follow-ups', 'Customer comms'],
   },
 
-  // IMAGE - Face Restore
+  // ═══════════════════════════════════════════
+  // BUSINESS - Lead Assistant
+  // ═══════════════════════════════════════════
   {
-    id: 'face-restore-ai',
-    title: 'Face Restore AI',
-    slug: 'face-restore-ai',
-    shortDescription: 'Rikthe cilësinë e fytyrave në foto të vjetra ose blur',
-    fullDescription: 'Face Restore AI përdor modele të specializuara për të rikthyer detajet e fytyrave në imazhe me cilësi të ulët, blur, ose të dëmtuara.',
-    categoryId: 'image',
-    subcategoryId: 'face-restore',
-    provider: 'Replicate',
-    modelType: 'Restoration',
-    imageUrl: '',
-    pricingType: 'free',
-    pricingText: 'Falas',
-    isFeatured: false,
-    isOfficial: true,
-    isPopular: false,
-    createdAt: '2023-11-01',
-    features: ['Old photo restoration', 'Blur fix', 'Detail enhancement', 'Batch support'],
-    examples: [],
-    tags: ['face', 'restore', 'enhance', 'old-photos'],
-    inputTypes: ['Image'],
-    outputTypes: ['Image'],
-    useCases: ['Foto familjare', 'Restaurim fotografik', 'Headshot enhancement'],
-  },
-
-  // VIDEO - Lip Sync
-  {
-    id: 'lip-sync-ai',
-    title: 'Lip Sync AI',
-    slug: 'lip-sync-ai',
-    shortDescription: 'Sinkronizo buzët e personazheve me çdo audio',
-    fullDescription: 'Lip Sync AI merr një video fyture dhe një audio file, dhe sinkronizon lëvizjet e buzëve me audio-n. Ideal për dubbing dhe content creation.',
-    categoryId: 'video',
-    subcategoryId: 'lip-sync',
-    provider: 'fal.ai',
-    modelType: 'Lip Sync',
-    imageUrl: '',
-    pricingType: 'paid',
-    pricingText: 'Nga $0.20/video',
-    isFeatured: false,
-    isOfficial: false,
-    isPopular: false,
-    createdAt: '2024-09-01',
-    features: ['Multi-language', 'Realistic sync', 'Emotion mapping', 'API access'],
-    examples: [],
-    tags: ['lip-sync', 'dubbing', 'video-editing'],
-    inputTypes: ['Video', 'Audio'],
-    outputTypes: ['Video'],
-    useCases: ['Dubbing', 'Content creation', 'Marketing videos', 'Education'],
-  },
-
-  // TEXT - Summarizer
-  {
-    id: 'summary-ai',
-    title: 'Summary AI',
-    slug: 'summary-ai',
-    shortDescription: 'Përmbledh dokumente, artikuj dhe tekste të gjata',
-    fullDescription: 'Summary AI kondenzon tekste të gjata në përmbledhje koncize. Mbështet PDF, URL, dhe tekst direkt. Kontrollon gjatësinë dhe stilin e output-it.',
-    categoryId: 'text',
-    subcategoryId: 'summarizer',
+    id: 'lead-assist-ai',
+    title: 'Lead Assistant AI',
+    slug: 'lead-assist-ai',
+    shortDescription: 'Gjenero dhe kualifiko lead-e automatikisht',
+    fullDescription: 'Lead Assistant AI ndihmon në identifikimin, kualifikimin, dhe menaxhimin e lead-eve. Integrohet me CRM dhe automatikon follow-up-et.',
+    categoryId: 'business',
+    subcategoryId: 'lead-assistant',
     provider: 'Custom',
-    modelType: 'LLM',
+    modelType: 'LLM + Automation',
     imageUrl: '',
-    pricingType: 'free',
-    pricingText: 'Falas',
+    badge: 'new',
+    pricingType: 'paid',
+    pricingText: 'Nga $39/muaj',
     isFeatured: false,
     isOfficial: false,
-    isPopular: true,
-    createdAt: '2024-03-01',
-    features: ['PDF support', 'URL import', 'Length control', 'Key points extraction'],
+    isPopular: false,
+    createdAt: '2024-10-15',
+    features: ['Lead scoring', 'CRM integration', 'Auto follow-up', 'Analytics dashboard'],
     examples: [],
-    tags: ['summary', 'document', 'research'],
-    inputTypes: ['Text', 'PDF', 'URL'],
-    outputTypes: ['Text'],
-    useCases: ['Kërkim akademik', 'News digest', 'Meeting notes', 'Dokumente ligjore'],
+    tags: ['leads', 'crm', 'sales', 'automation'],
+    inputTypes: ['Text', 'Data'],
+    outputTypes: ['Text', 'Data'],
+    useCases: ['B2B sales', 'Lead nurturing', 'Outbound sales', 'Market research'],
   },
 ];
