@@ -52,6 +52,8 @@ export function useCreateDonation() {
       currency?: string;
       message?: string;
       donor_name?: string;
+      return_url: string;
+      cancel_url: string;
     }) => {
       const { data, error } = await supabase.functions.invoke('create-paypal-order', {
         body: params,
