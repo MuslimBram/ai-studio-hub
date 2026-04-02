@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useScheduledPosts, usePublishedPosts, useSocialAccounts, useContentSuggestions } from "@/hooks/useContentEngine";
 import { CalendarDays, FileText, TrendingUp, Users, Zap, BarChart3 } from "lucide-react";
+import { AiUsageMeter } from "@/components/AiUsageMeter";
 
 export function ContentDashboard() {
   const { data: scheduled = [] } = useScheduledPosts();
