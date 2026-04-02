@@ -17,12 +17,14 @@ export default function DonatePage() {
   const captureDonation = useCaptureDonation();
 
   // Handle PayPal return
+  const status = searchParams.get('status');
+  const token = searchParams.get('token');
+
   useEffect(() => {
-    const token = searchParams.get('token');
-    if (token && !captureDonation.isSuccess && !captureDonation.isPending) {
+    if (token && status === 'success' && !captureDonation.isSuccess && !captureDonation.isPending) {
       captureDonation.mutate(token);
     }
-  }, [searchParams]);
+  }, [token, status]);
 
   return (
     <div className="min-h-screen bg-background">
