@@ -9,6 +9,8 @@ const BodySchema = z.object({
   currency: z.string().default('EUR'),
   message: z.string().max(500).default(''),
   donor_name: z.string().max(100).default(''),
+  return_url: z.string().url(),
+  cancel_url: z.string().url(),
 });
 
 async function getPayPalAccessToken(): Promise<string> {
