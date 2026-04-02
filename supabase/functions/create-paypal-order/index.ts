@@ -46,7 +46,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { amount, currency, message, donor_name } = parsed.data;
+    const { amount, currency, message, donor_name, return_url, cancel_url } = parsed.data;
 
     // Get user if authenticated
     let userId: string | null = null;
