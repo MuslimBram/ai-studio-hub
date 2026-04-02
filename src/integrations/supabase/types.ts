@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_usage_logs: {
+        Row: {
+          action_type: string
+          category: string
+          created_at: string
+          id: string
+          tokens_used: number
+          user_id: string
+        }
+        Insert: {
+          action_type?: string
+          category?: string
+          created_at?: string
+          id?: string
+          tokens_used?: number
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          category?: string
+          created_at?: string
+          id?: string
+          tokens_used?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           bg_color_class: string
@@ -206,6 +233,66 @@ export type Database = {
           id?: string
           used?: boolean
           user_id?: string
+        }
+        Relationships: []
+      }
+      plans: {
+        Row: {
+          ai_features_enabled: string[]
+          ai_image_generations_per_day: number
+          ai_replies_per_day: number
+          ai_text_generations_per_day: number
+          ai_video_generations_per_day: number
+          created_at: string
+          description: string
+          display_order: number
+          features_enabled: string[]
+          id: string
+          is_active: boolean
+          max_channels: number
+          name: string
+          price_monthly: number
+          price_yearly: number
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          ai_features_enabled?: string[]
+          ai_image_generations_per_day?: number
+          ai_replies_per_day?: number
+          ai_text_generations_per_day?: number
+          ai_video_generations_per_day?: number
+          created_at?: string
+          description?: string
+          display_order?: number
+          features_enabled?: string[]
+          id: string
+          is_active?: boolean
+          max_channels?: number
+          name: string
+          price_monthly?: number
+          price_yearly?: number
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          ai_features_enabled?: string[]
+          ai_image_generations_per_day?: number
+          ai_replies_per_day?: number
+          ai_text_generations_per_day?: number
+          ai_video_generations_per_day?: number
+          created_at?: string
+          description?: string
+          display_order?: number
+          features_enabled?: string[]
+          id?: string
+          is_active?: boolean
+          max_channels?: number
+          name?: string
+          price_monthly?: number
+          price_yearly?: number
+          slug?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -656,11 +743,60 @@ export type Database = {
         }
         Relationships: []
       }
+      user_subscriptions: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          plan_id: string
+          started_at: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          plan_id: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          plan_id?: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      get_ai_usage_today: {
+        Args: { _user_id: string }
+        Returns: {
+          action_type: string
+          category: string
+          usage_count: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
