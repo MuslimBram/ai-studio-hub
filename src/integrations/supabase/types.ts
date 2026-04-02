@@ -53,6 +53,93 @@ export type Database = {
         }
         Relationships: []
       }
+      competitor_data: {
+        Row: {
+          competitor_name: string
+          competitor_url: string
+          content_gaps: string[]
+          created_at: string
+          id: string
+          keywords: string[]
+          last_scanned_at: string | null
+          platform: string
+          posting_frequency: string
+          suggested_topics: string[]
+          top_posts: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          competitor_name?: string
+          competitor_url?: string
+          content_gaps?: string[]
+          created_at?: string
+          id?: string
+          keywords?: string[]
+          last_scanned_at?: string | null
+          platform?: string
+          posting_frequency?: string
+          suggested_topics?: string[]
+          top_posts?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          competitor_name?: string
+          competitor_url?: string
+          content_gaps?: string[]
+          created_at?: string
+          id?: string
+          keywords?: string[]
+          last_scanned_at?: string | null
+          platform?: string
+          posting_frequency?: string
+          suggested_topics?: string[]
+          top_posts?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      content_suggestions: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_used: boolean
+          keywords: string[]
+          platform: string
+          score: number
+          suggestion_type: string
+          tone: string
+          user_id: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_used?: boolean
+          keywords?: string[]
+          platform?: string
+          score?: number
+          suggestion_type?: string
+          tone?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_used?: boolean
+          keywords?: string[]
+          platform?: string
+          score?: number
+          suggestion_type?: string
+          tone?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       donations: {
         Row: {
           amount: number
@@ -155,6 +242,176 @@ export type Database = {
           is_donor?: boolean
           total_donated?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      published_posts: {
+        Row: {
+          content: string
+          created_at: string
+          engagement_clicks: number
+          engagement_comments: number
+          engagement_likes: number
+          engagement_shares: number
+          external_post_id: string | null
+          id: string
+          media_urls: string[]
+          platform: string
+          published_at: string
+          scheduled_post_id: string | null
+          social_account_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          engagement_clicks?: number
+          engagement_comments?: number
+          engagement_likes?: number
+          engagement_shares?: number
+          external_post_id?: string | null
+          id?: string
+          media_urls?: string[]
+          platform?: string
+          published_at?: string
+          scheduled_post_id?: string | null
+          social_account_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          engagement_clicks?: number
+          engagement_comments?: number
+          engagement_likes?: number
+          engagement_shares?: number
+          external_post_id?: string | null
+          id?: string
+          media_urls?: string[]
+          platform?: string
+          published_at?: string
+          scheduled_post_id?: string | null
+          social_account_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "published_posts_scheduled_post_id_fkey"
+            columns: ["scheduled_post_id"]
+            isOneToOne: false
+            referencedRelation: "scheduled_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "published_posts_social_account_id_fkey"
+            columns: ["social_account_id"]
+            isOneToOne: false
+            referencedRelation: "social_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scheduled_posts: {
+        Row: {
+          ai_generated: boolean
+          content: string
+          created_at: string
+          hashtags: string[]
+          id: string
+          is_recurring: boolean
+          media_urls: string[]
+          platform: string
+          recurrence_rule: string | null
+          scheduled_at: string
+          social_account_id: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_generated?: boolean
+          content?: string
+          created_at?: string
+          hashtags?: string[]
+          id?: string
+          is_recurring?: boolean
+          media_urls?: string[]
+          platform?: string
+          recurrence_rule?: string | null
+          scheduled_at: string
+          social_account_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_generated?: boolean
+          content?: string
+          created_at?: string
+          hashtags?: string[]
+          id?: string
+          is_recurring?: boolean
+          media_urls?: string[]
+          platform?: string
+          recurrence_rule?: string | null
+          scheduled_at?: string
+          social_account_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheduled_posts_social_account_id_fkey"
+            columns: ["social_account_id"]
+            isOneToOne: false
+            referencedRelation: "social_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_accounts: {
+        Row: {
+          access_token: string
+          account_id: string
+          account_name: string
+          created_at: string
+          id: string
+          is_connected: boolean
+          platform: string
+          refresh_token: string | null
+          token_expires_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token?: string
+          account_id?: string
+          account_name?: string
+          created_at?: string
+          id?: string
+          is_connected?: boolean
+          platform: string
+          refresh_token?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string
+          account_id?: string
+          account_name?: string
+          created_at?: string
+          id?: string
+          is_connected?: boolean
+          platform?: string
+          refresh_token?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
