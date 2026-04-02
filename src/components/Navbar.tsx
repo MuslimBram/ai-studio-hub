@@ -1,7 +1,14 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Zap, Menu, X } from 'lucide-react';
+import { Zap, Menu, X, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const navLinks = [
   { to: '/', label: 'Kryefaqja' },
@@ -16,6 +23,7 @@ const navLinks = [
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const { user, loading, signOut } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 border-b bg-card/80 backdrop-blur-lg">
@@ -48,6 +56,42 @@ export function Navbar() {
             );
           })}
         </nav>
+
+        {/* Auth area */}
+        <div className="hidden md:flex items-center gap-2">
+          {!loading && (
+            user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="rounded-full">
+                    <User className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      Profili
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={signOut} className="flex items-center gap-2">
+                    <LogOut className="h-4 w-4" />
+                    Dilni
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/login">Kyçu</Link>
+                </Button>
+                <Button size="sm" asChild>
+                  <Link to="/signup">Regjistrohu</Link>
+                </Button>
+              </>
+            )
+          )}
+        </div>
 
         {/* Mobile toggle */}
         <Button
@@ -84,6 +128,29 @@ export function Navbar() {
                 </Link>
               );
             })}
+            <div className="mt-2 border-t pt-3 flex flex-col gap-1">
+              {!loading && (
+                user ? (
+                  <>
+                    <Link to="/profile" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary">
+                      Profili
+                    </Link>
+                    <button onClick={() => { signOut(); setMobileOpen(false); }} className="rounded-lg px-4 py-3 text-left text-sm text-muted-foreground hover:text-foreground hover:bg-secondary">
+                      Dilni
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/login" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-primary font-medium">
+                      Kyçu
+                    </Link>
+                    <Link to="/signup" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-primary font-medium">
+                      Regjistrohu
+                    </Link>
+                  </>
+                )
+              )}
+            </div>
           </nav>
         </div>
       )}
