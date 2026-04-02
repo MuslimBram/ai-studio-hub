@@ -57,6 +57,12 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        "cat-image": "hsl(var(--cat-image))",
+        "cat-video": "hsl(var(--cat-video))",
+        "cat-audio": "hsl(var(--cat-audio))",
+        "cat-text": "hsl(var(--cat-text))",
+        "cat-games": "hsl(var(--cat-games))",
+        "cat-business": "hsl(var(--cat-business))",
       },
       borderRadius: {
         lg: "var(--radius)",
