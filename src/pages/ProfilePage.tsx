@@ -26,6 +26,8 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const { data: myDonations } = useMyDonations();
 
+  useSEO({ title: 'Profili Im' });
+
   useEffect(() => {
     if (!authLoading && !user) {
       navigate('/login');
