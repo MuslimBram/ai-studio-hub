@@ -27,6 +27,11 @@ export default function SubcategoryPage() {
     query: query || undefined,
   });
 
+  useSEO({
+    title: subcategory ? `${subcategory.name} — ${category?.name}` : undefined,
+    description: subcategory?.description || undefined,
+  });
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -50,11 +55,6 @@ export default function SubcategoryPage() {
       </div>
     );
   }
-
-  useSEO({
-    title: `${subcategory.name} — ${category.name}`,
-    description: subcategory.description || `Mjete AI për ${subcategory.name}`,
-  });
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
