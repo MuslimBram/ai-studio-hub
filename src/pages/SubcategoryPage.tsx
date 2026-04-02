@@ -51,8 +51,13 @@ export default function SubcategoryPage() {
     );
   }
 
+  useSEO({
+    title: `${subcategory.name} — ${category.name}`,
+    description: subcategory.description || `Mjete AI për ${subcategory.name}`,
+  });
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
 
       <div className="container pt-6">
