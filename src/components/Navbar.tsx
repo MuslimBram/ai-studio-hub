@@ -131,6 +131,9 @@ export function Navbar() {
                 </Link>
               );
             })}
+            <Link to="/donate" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-destructive font-medium flex items-center gap-2">
+              <Heart className="h-4 w-4" /> Dhuro
+            </Link>
             <div className="mt-2 border-t pt-3 flex flex-col gap-1">
               {!loading && (
                 user ? (
