@@ -79,6 +79,14 @@ export function Navbar() {
                       Profili
                     </Link>
                   </DropdownMenuItem>
+                  {isAdmin && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin" className="flex items-center gap-2">
+                        <Shield className="h-4 w-4" />
+                        Admin Panel
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onClick={signOut} className="flex items-center gap-2">
                     <LogOut className="h-4 w-4" />
                     Dilni
