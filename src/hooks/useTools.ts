@@ -11,6 +11,7 @@ export function useTools(opts?: {
   featured?: boolean;
   popular?: boolean;
   official?: boolean;
+  tags?: string[];
   limit?: number;
   orderByCreated?: boolean;
 }) {
@@ -26,9 +27,12 @@ export function useTools(opts?: {
       if (opts?.featured) q = q.eq('is_featured', true);
       if (opts?.popular) q = q.eq('is_popular', true);
       if (opts?.official) q = q.eq('is_official', true);
+      if (opts?.tags?.length) {
+        q = q.contains('tags', opts.tags);
+      }
       if (opts?.query) {
         const search = `%${opts.query}%`;
-        q = q.or(`title.ilike.${search},short_description.ilike.${search},provider.ilike.${search}`);
+        q = q.or(`title.ilike.${search},short_description.ilike.${search},provider.ilike.${search},tags.cs.{${opts.query.toLowerCase()}}`);
       }
       if (opts?.orderByCreated) q = q.order('created_at', { ascending: false });
       if (opts?.limit) q = q.limit(opts.limit);
@@ -84,7 +88,7 @@ export function useProviders() {
         .from('tools')
         .select('provider');
       if (error) throw error;
-      const unique = [...new Set((data || []).map(d => d.provider))].sort();
+      const unique = [...new Set((data || []).map(d => d.provider).filter(Boolean))].sort();
       return unique;
     },
     staleTime: 5 * 60 * 1000,
