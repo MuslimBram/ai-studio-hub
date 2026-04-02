@@ -4,18 +4,38 @@ import { Navbar } from '@/components/Navbar';
 import { SearchBar } from '@/components/SearchBar';
 import { FilterSidebar } from '@/components/FilterSidebar';
 import { ToolCard } from '@/components/ToolCard';
-import { getCategoryBySlug, getSubcategoryBySlug, filterTools } from '@/data/helpers';
-import { categoryIcons } from '@/data/icons';
+import { useCategoryBySlug, useSubcategoryBySlug } from '@/hooks/useCategories';
+import { useTools } from '@/hooks/useTools';
 import { ChevronRight } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function SubcategoryPage() {
   const { categorySlug, subcategorySlug } = useParams<{ categorySlug: string; subcategorySlug: string }>();
-  const category = getCategoryBySlug(categorySlug || '');
-  const subcategory = getSubcategoryBySlug(categorySlug || '', subcategorySlug || '');
+  const { data: category } = useCategoryBySlug(categorySlug || '');
+  const { data: subcategory, isLoading } = useSubcategoryBySlug(categorySlug || '', subcategorySlug || '');
 
   const [query, setQuery] = useState('');
   const [pricing, setPricing] = useState('');
   const [provider, setProvider] = useState('');
+
+  const { data: filteredTools = [], isLoading: toolsLoading } = useTools({
+    subcategoryId: subcategory?.id,
+    pricingType: pricing || undefined,
+    provider: provider || undefined,
+    query: query || undefined,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="container py-20">
+          <Skeleton className="h-10 w-64 mb-4" />
+          <Skeleton className="h-6 w-96" />
+        </div>
+      </div>
+    );
+  }
 
   if (!category || !subcategory) {
     return (
@@ -28,13 +48,6 @@ export default function SubcategoryPage() {
       </div>
     );
   }
-
-  const filteredTools = filterTools({
-    subcategoryId: subcategory.id,
-    pricingType: pricing || undefined,
-    provider: provider || undefined,
-    query: query || undefined,
-  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -68,7 +81,13 @@ export default function SubcategoryPage() {
           </div>
           <div className="flex-1">
             <div className="mb-4 text-sm text-muted-foreground">{filteredTools.length} mjete</div>
-            {filteredTools.length > 0 ? (
+            {toolsLoading ? (
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <Skeleton key={i} className="h-64 rounded-xl" />
+                ))}
+              </div>
+            ) : filteredTools.length > 0 ? (
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
                 {filteredTools.map((tool) => (
                   <ToolCard key={tool.id} tool={tool} />

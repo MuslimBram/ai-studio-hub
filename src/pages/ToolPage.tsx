@@ -1,9 +1,10 @@
 import { useParams, Link } from 'react-router-dom';
 import { Navbar } from '@/components/Navbar';
-import { getToolBySlug, getCategoryBySlug } from '@/data/helpers';
-import { subcategories } from '@/data/categories';
+import { useToolBySlug } from '@/hooks/useTools';
+import { useCategoryBySlug, useSubcategoryBySlug } from '@/hooks/useCategories';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ChevronRight, ExternalLink, Sparkles, Star, Award, Shield, CheckCircle } from 'lucide-react';
 
 const badgeConfig: Record<string, { label: string; icon: React.ReactNode }> = {
@@ -15,7 +16,24 @@ const badgeConfig: Record<string, { label: string; icon: React.ReactNode }> = {
 
 export default function ToolPage() {
   const { toolSlug } = useParams<{ toolSlug: string }>();
-  const tool = getToolBySlug(toolSlug || '');
+  const { data: tool, isLoading } = useToolBySlug(toolSlug || '');
+  const { data: category } = useCategoryBySlug(tool?.categoryId ? '' : '');
+  
+  // We need category data based on tool's categoryId - use a separate approach
+  const categorySlug = tool?.categoryId || '';
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="container py-20">
+          <Skeleton className="h-10 w-64 mb-4" />
+          <Skeleton className="h-6 w-96 mb-8" />
+          <Skeleton className="h-96 rounded-xl" />
+        </div>
+      </div>
+    );
+  }
 
   if (!tool) {
     return (
@@ -29,40 +47,25 @@ export default function ToolPage() {
     );
   }
 
-  const category = getCategoryBySlug(tool.categoryId);
-  const subcategory = subcategories.find((s) => s.id === tool.subcategoryId);
   const badge = tool.badge ? badgeConfig[tool.badge] : null;
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      {/* Breadcrumb */}
       <div className="container pt-6">
         <nav className="flex items-center gap-2 text-sm text-muted-foreground">
           <Link to="/" className="hover:text-foreground transition-colors">Kryefaqja</Link>
           <ChevronRight className="h-3 w-3" />
-          {category && (
-            <>
-              <Link to={`/tools/${category.slug}`} className="hover:text-foreground transition-colors">{category.name}</Link>
-              <ChevronRight className="h-3 w-3" />
-            </>
-          )}
-          {subcategory && (
-            <>
-              <Link to={`/tools/${category?.slug}/${subcategory.slug}`} className="hover:text-foreground transition-colors">{subcategory.name}</Link>
-              <ChevronRight className="h-3 w-3" />
-            </>
-          )}
+          <Link to={`/tools/${tool.categoryId}`} className="hover:text-foreground transition-colors">{tool.categoryId}</Link>
+          <ChevronRight className="h-3 w-3" />
           <span className="text-foreground font-medium">{tool.title}</span>
         </nav>
       </div>
 
       <div className="container py-8">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
-          {/* Main content */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Hero card */}
             <div className="rounded-xl border bg-card p-8 shadow-card">
               <div className="flex items-start gap-4 mb-6">
                 <div className="h-16 w-16 rounded-xl bg-secondary flex items-center justify-center text-2xl font-bold text-muted-foreground/30">
@@ -82,12 +85,6 @@ export default function ToolPage() {
               </div>
 
               <div className="flex flex-wrap gap-2 mb-6">
-                {category && (
-                  <Badge variant="secondary">{category.name}</Badge>
-                )}
-                {subcategory && (
-                  <Badge variant="outline">{subcategory.name}</Badge>
-                )}
                 <Badge variant="outline">{tool.provider}</Badge>
                 <Badge variant="outline">{tool.modelType}</Badge>
               </div>
@@ -95,71 +92,63 @@ export default function ToolPage() {
               <p className="text-foreground leading-relaxed">{tool.fullDescription}</p>
             </div>
 
-            {/* Features */}
-            <div className="rounded-xl border bg-card p-8 shadow-card">
-              <h2 className="text-xl font-bold text-foreground mb-4">Veçoritë</h2>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                {tool.features.map((f, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary shrink-0" />
-                    <span className="text-sm text-foreground">{f}</span>
-                  </div>
-                ))}
+            {tool.features.length > 0 && (
+              <div className="rounded-xl border bg-card p-8 shadow-card">
+                <h2 className="text-xl font-bold text-foreground mb-4">Veçoritë</h2>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {tool.features.map((f, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-primary shrink-0" />
+                      <span className="text-sm text-foreground">{f}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
-            {/* Use Cases */}
-            <div className="rounded-xl border bg-card p-8 shadow-card">
-              <h2 className="text-xl font-bold text-foreground mb-4">Përdorime</h2>
-              <div className="flex flex-wrap gap-2">
-                {tool.useCases.map((uc, i) => (
-                  <span key={i} className="rounded-full bg-secondary px-3 py-1.5 text-sm text-foreground">
-                    {uc}
-                  </span>
-                ))}
+            {tool.useCases.length > 0 && (
+              <div className="rounded-xl border bg-card p-8 shadow-card">
+                <h2 className="text-xl font-bold text-foreground mb-4">Përdorime</h2>
+                <div className="flex flex-wrap gap-2">
+                  {tool.useCases.map((uc, i) => (
+                    <span key={i} className="rounded-full bg-secondary px-3 py-1.5 text-sm text-foreground">{uc}</span>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
-            {/* Input/Output */}
             <div className="rounded-xl border bg-card p-8 shadow-card">
               <h2 className="text-xl font-bold text-foreground mb-4">Input / Output</h2>
               <div className="grid grid-cols-2 gap-6">
                 <div>
                   <h3 className="text-sm font-semibold text-muted-foreground mb-2">Input</h3>
                   <div className="flex flex-wrap gap-2">
-                    {tool.inputTypes.map((t, i) => (
-                      <Badge key={i} variant="outline">{t}</Badge>
-                    ))}
+                    {tool.inputTypes.map((t, i) => <Badge key={i} variant="outline">{t}</Badge>)}
                   </div>
                 </div>
                 <div>
                   <h3 className="text-sm font-semibold text-muted-foreground mb-2">Output</h3>
                   <div className="flex flex-wrap gap-2">
-                    {tool.outputTypes.map((t, i) => (
-                      <Badge key={i} variant="outline">{t}</Badge>
-                    ))}
+                    {tool.outputTypes.map((t, i) => <Badge key={i} variant="outline">{t}</Badge>)}
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Tags */}
-            <div className="rounded-xl border bg-card p-8 shadow-card">
-              <h2 className="text-xl font-bold text-foreground mb-4">Tags</h2>
-              <div className="flex flex-wrap gap-2">
-                {tool.tags.map((tag, i) => (
-                  <span key={i} className="rounded-md bg-muted px-2.5 py-1 text-xs text-muted-foreground">
-                    #{tag}
-                  </span>
-                ))}
+            {tool.tags.length > 0 && (
+              <div className="rounded-xl border bg-card p-8 shadow-card">
+                <h2 className="text-xl font-bold text-foreground mb-4">Tags</h2>
+                <div className="flex flex-wrap gap-2">
+                  {tool.tags.map((tag, i) => (
+                    <span key={i} className="rounded-md bg-muted px-2.5 py-1 text-xs text-muted-foreground">#{tag}</span>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
-          {/* Sidebar */}
           <div className="space-y-6">
             <div className="sticky top-24 space-y-6">
-              {/* CTA card */}
               <div className="rounded-xl border bg-card p-6 shadow-card">
                 <div className="mb-4">
                   <span className="text-sm text-muted-foreground">Çmimi</span>
@@ -176,7 +165,6 @@ export default function ToolPage() {
                 </Button>
               </div>
 
-              {/* Info card */}
               <div className="rounded-xl border bg-card p-6 shadow-card space-y-4">
                 <div>
                   <span className="text-xs text-muted-foreground">Provider</span>
@@ -187,16 +175,8 @@ export default function ToolPage() {
                   <div className="text-sm font-medium text-foreground">{tool.modelType}</div>
                 </div>
                 <div>
-                  <span className="text-xs text-muted-foreground">Kategori</span>
-                  <div className="text-sm font-medium text-foreground">{category?.name}</div>
-                </div>
-                <div>
-                  <span className="text-xs text-muted-foreground">Nënkategori</span>
-                  <div className="text-sm font-medium text-foreground">{subcategory?.name}</div>
-                </div>
-                <div>
                   <span className="text-xs text-muted-foreground">Shtuar më</span>
-                  <div className="text-sm font-medium text-foreground">{new Date(tool.createdAt).toLocaleDateString('sq-AL')}</div>
+                  <div className="text-sm font-medium text-foreground">{new Date(tool.created_at).toLocaleDateString('sq-AL')}</div>
                 </div>
               </div>
             </div>
