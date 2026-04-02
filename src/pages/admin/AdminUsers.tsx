@@ -2,19 +2,25 @@ import { AdminLayout } from '@/components/AdminLayout';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { Badge } from '@/components/ui/badge';
+import { DonorBadge } from '@/components/DonorBadge';
+
+interface AdminProfile {
+  id: string;
+  display_name: string;
+  bio: string;
+  avatar_url: string;
+  is_donor: boolean;
+  total_donated: number;
+  donor_since: string | null;
+  created_at: string;
+  roles: string[];
+}
 
 export default function AdminUsers() {
-  // Fetch profiles (admins can see via service role, but profiles RLS only shows own)
-  // For a full admin user list, we query profiles that the admin can see
-  const { data: profiles = [] } = useQuery({
-    queryKey: ['admin-profiles'],
-    queryFn: async () => {
-      // Admin can only see their own profile via RLS. For full user management,
-      // we'd need an edge function. For now, show what's accessible.
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
+  const { data: profiles = [], isLoading } = useQuery({
+    queryKey: ['admin-users'],
+    queryFn: async (): Promise<AdminProfile[]> => {
+      const { data, error } = await supabase.functions.invoke('admin-list-users');
       if (error) throw error;
       return data || [];
     },
@@ -30,19 +36,31 @@ export default function AdminUsers() {
             <thead className="bg-muted">
               <tr>
                 <th className="text-left p-3 font-medium text-muted-foreground">Emri</th>
-                <th className="text-left p-3 font-medium text-muted-foreground">Bio</th>
+                <th className="text-left p-3 font-medium text-muted-foreground">Rolet</th>
                 <th className="text-left p-3 font-medium text-muted-foreground">Donator</th>
+                <th className="text-left p-3 font-medium text-muted-foreground">Total Dhuruar</th>
                 <th className="text-left p-3 font-medium text-muted-foreground">Regjistruar</th>
               </tr>
             </thead>
             <tbody className="divide-y">
               {profiles.map((p) => (
                 <tr key={p.id} className="hover:bg-muted/50">
-                  <td className="p-3 font-medium text-foreground">{p.display_name || '—'}</td>
-                  <td className="p-3 text-muted-foreground max-w-[300px] truncate">{p.bio || '—'}</td>
                   <td className="p-3">
-                    {p.is_donor ? <Badge>Donator</Badge> : <Badge variant="outline">Jo</Badge>}
+                    <div className="font-medium text-foreground">{p.display_name || '—'}</div>
+                    <div className="text-xs text-muted-foreground truncate max-w-[200px]">{p.bio || ''}</div>
                   </td>
+                  <td className="p-3">
+                    <div className="flex gap-1">
+                      {p.roles.length > 0
+                        ? p.roles.map(r => <Badge key={r} variant={r === 'admin' ? 'default' : 'outline'}>{r}</Badge>)
+                        : <Badge variant="outline">user</Badge>
+                      }
+                    </div>
+                  </td>
+                  <td className="p-3">
+                    {p.is_donor ? <DonorBadge totalDonated={Number(p.total_donated)} /> : <span className="text-muted-foreground">—</span>}
+                  </td>
+                  <td className="p-3 text-foreground">{Number(p.total_donated) > 0 ? `${Number(p.total_donated).toFixed(2)}€` : '—'}</td>
                   <td className="p-3 text-muted-foreground">
                     {new Date(p.created_at).toLocaleDateString('sq-AL')}
                   </td>
@@ -51,14 +69,10 @@ export default function AdminUsers() {
             </tbody>
           </table>
         </div>
-        {profiles.length === 0 && (
+        {profiles.length === 0 && !isLoading && (
           <div className="p-8 text-center text-muted-foreground">Nuk ka përdorues ende.</div>
         )}
       </div>
-
-      <p className="mt-4 text-xs text-muted-foreground">
-        * Për menaxhim të plotë të përdoruesve, nevojitet akses i zgjeruar nga paneli i backend-it.
-      </p>
     </AdminLayout>
   );
 }
