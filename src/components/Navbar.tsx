@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Zap, Menu, X, User, LogOut } from 'lucide-react';
+import { Zap, Menu, X, User, LogOut, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -59,6 +59,9 @@ export function Navbar() {
 
         {/* Auth area */}
         <div className="hidden md:flex items-center gap-2">
+          <Button variant="ghost" size="sm" asChild className="text-destructive hover:text-destructive">
+            <Link to="/donate"><Heart className="h-4 w-4 mr-1" />Dhuro</Link>
+          </Button>
           {!loading && (
             user ? (
               <DropdownMenu>
@@ -128,6 +131,9 @@ export function Navbar() {
                 </Link>
               );
             })}
+            <Link to="/donate" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-destructive font-medium flex items-center gap-2">
+              <Heart className="h-4 w-4" /> Dhuro
+            </Link>
             <div className="mt-2 border-t pt-3 flex flex-col gap-1">
               {!loading && (
                 user ? (
