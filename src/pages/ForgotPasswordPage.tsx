@@ -2,16 +2,20 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Navbar } from '@/components/Navbar';
+import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
+import { useSEO } from '@/hooks/useSEO';
 import { Loader2 } from 'lucide-react';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+
+  useSEO({ title: 'Rivendos Fjalëkalimin', description: 'Rivendosni fjalëkalimin e llogarisë tuaj.' });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,23 +37,24 @@ export default function ForgotPasswordPage() {
 
   if (sent) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background flex flex-col">
         <Navbar />
-        <div className="container flex items-center justify-center py-20">
+        <div className="container flex items-center justify-center py-20 flex-1">
           <div className="w-full max-w-md rounded-xl border bg-card p-8 shadow-card text-center">
             <h1 className="mb-4 text-2xl font-bold text-foreground">Kontrolloni Email-in</h1>
             <p className="text-muted-foreground">Nëse llogaria ekziston, kemi dërguar udhëzime për rivendosjen e fjalëkalimit.</p>
             <Link to="/login" className="mt-6 inline-block text-primary hover:underline">Kthehu te kyçja</Link>
           </div>
         </div>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
-      <div className="container flex items-center justify-center py-20">
+      <div className="container flex items-center justify-center py-20 flex-1">
         <div className="w-full max-w-md rounded-xl border bg-card p-8 shadow-card">
           <h1 className="mb-6 text-2xl font-bold text-foreground text-center">Rivendos Fjalëkalimin</h1>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -67,6 +72,7 @@ export default function ForgotPasswordPage() {
           </p>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
