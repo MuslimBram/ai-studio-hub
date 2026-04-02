@@ -14,6 +14,11 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ProfilePage from "./pages/ProfilePage";
 import DonatePage from "./pages/DonatePage";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminTools from "./pages/admin/AdminTools";
+import AdminCategories from "./pages/admin/AdminCategories";
+import AdminDonations from "./pages/admin/AdminDonations";
+import AdminUsers from "./pages/admin/AdminUsers";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
