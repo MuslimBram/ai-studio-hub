@@ -16,6 +16,7 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ProfilePage from "./pages/ProfilePage";
 import DonatePage from "./pages/DonatePage";
+import ContentEnginePage from "./pages/ContentEnginePage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminTools from "./pages/admin/AdminTools";
 import AdminCategories from "./pages/admin/AdminCategories";

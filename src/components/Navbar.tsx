@@ -19,6 +19,7 @@ const navLinks = [
   { to: '/tools/text', label: 'Tekst' },
   { to: '/tools/games', label: 'Lojra' },
   { to: '/tools/business', label: 'Biznes' },
+  { to: '/content-engine', label: 'Content Engine' },
 ];
 
 export function Navbar() {
