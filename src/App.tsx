@@ -45,6 +45,7 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/donate" element={<DonatePage />} />
+            <Route path="/tool-access" element={<ToolAccessPage />} />
 
             {/* Protected routes — require 2FA */}
             <Route path="/profile" element={<MfaGuard><ProfilePage /></MfaGuard>} />
