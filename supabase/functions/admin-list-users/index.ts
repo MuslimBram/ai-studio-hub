@@ -1,13 +1,14 @@
 import { corsHeaders } from '@supabase/supabase-js/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
+const OWNER_EMAIL = 'amirah.br0006@gmail.com';
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    // Verify the caller is authenticated
     const authHeader = req.headers.get('authorization');
     if (!authHeader) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -18,7 +19,7 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_PUBLISHABLE_KEY')!,
+      Deno.env.get('SUPABASE_ANON_KEY')!,
       { global: { headers: { authorization: authHeader } } }
     );
 
@@ -30,12 +31,15 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Check admin role
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
 
+    // Owner fallback check
+    const isOwner = user.email === OWNER_EMAIL;
+
+    // Check admin role in DB
     const { data: roleData } = await supabaseAdmin
       .from('user_roles')
       .select('role')
@@ -43,14 +47,14 @@ Deno.serve(async (req) => {
       .eq('role', 'admin')
       .maybeSingle();
 
-    if (!roleData) {
+    if (!roleData && !isOwner) {
       return new Response(JSON.stringify({ error: 'Forbidden' }), {
         status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    // Fetch all profiles using service role
+    // Fetch all profiles
     const { data: profiles, error } = await supabaseAdmin
       .from('profiles')
       .select('*')
@@ -58,7 +62,7 @@ Deno.serve(async (req) => {
 
     if (error) throw error;
 
-    // Fetch roles for all users
+    // Fetch roles
     const { data: roles } = await supabaseAdmin
       .from('user_roles')
       .select('user_id, role');
@@ -69,8 +73,16 @@ Deno.serve(async (req) => {
       rolesMap[r.user_id].push(r.role);
     });
 
+    // Fetch emails from auth
+    const { data: authUsers } = await supabaseAdmin.auth.admin.listUsers();
+    const emailMap: Record<string, string> = {};
+    (authUsers?.users || []).forEach((u: any) => {
+      emailMap[u.id] = u.email || '';
+    });
+
     const enrichedProfiles = (profiles || []).map((p: any) => ({
       ...p,
+      email: emailMap[p.id] || '',
       roles: rolesMap[p.id] || [],
     }));
 
