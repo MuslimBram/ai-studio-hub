@@ -90,6 +90,8 @@ export default function SubcategoryPage() {
               onPricingChange={setPricing}
               selectedProvider={provider}
               onProviderChange={setProvider}
+              selectedTags={selectedTags}
+              onTagToggle={handleTagToggle}
             />
           </div>
           <div className="flex-1">
