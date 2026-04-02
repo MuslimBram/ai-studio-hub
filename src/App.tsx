@@ -41,6 +41,11 @@ const App = () => (
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/donate" element={<DonatePage />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/tools" element={<AdminTools />} />
+            <Route path="/admin/categories" element={<AdminCategories />} />
+            <Route path="/admin/donations" element={<AdminDonations />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
