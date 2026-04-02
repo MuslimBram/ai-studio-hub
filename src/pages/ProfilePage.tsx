@@ -81,7 +81,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       <div className="container py-12 max-w-lg">
         <div className="flex items-center gap-3 mb-8">
