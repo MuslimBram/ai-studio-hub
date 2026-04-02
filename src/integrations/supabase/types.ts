@@ -14,7 +14,208 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      categories: {
+        Row: {
+          bg_color_class: string
+          color_class: string
+          created_at: string
+          description: string
+          display_order: number
+          icon: string
+          id: string
+          name: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          bg_color_class?: string
+          color_class?: string
+          created_at?: string
+          description?: string
+          display_order?: number
+          icon?: string
+          id: string
+          name: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          bg_color_class?: string
+          color_class?: string
+          created_at?: string
+          description?: string
+          display_order?: number
+          icon?: string
+          id?: string
+          name?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      subcategories: {
+        Row: {
+          category_id: string
+          created_at: string
+          description: string
+          id: string
+          name: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          description?: string
+          id: string
+          name: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          description?: string
+          id?: string
+          name?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subcategories_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tool_examples: {
+        Row: {
+          created_at: string
+          id: string
+          media_type: string
+          media_url: string
+          tool_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          media_type: string
+          media_url: string
+          tool_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          media_type?: string
+          media_url?: string
+          tool_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tool_examples_tool_id_fkey"
+            columns: ["tool_id"]
+            isOneToOne: false
+            referencedRelation: "tools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tools: {
+        Row: {
+          badge: string | null
+          category_id: string
+          created_at: string
+          features: string[]
+          full_description: string
+          id: string
+          image_url: string
+          input_types: string[]
+          is_featured: boolean
+          is_official: boolean
+          is_popular: boolean
+          model_type: string
+          output_types: string[]
+          pricing_text: string
+          pricing_type: string
+          provider: string
+          short_description: string
+          slug: string
+          subcategory_id: string
+          tags: string[]
+          title: string
+          updated_at: string
+          use_cases: string[]
+        }
+        Insert: {
+          badge?: string | null
+          category_id: string
+          created_at?: string
+          features?: string[]
+          full_description?: string
+          id: string
+          image_url?: string
+          input_types?: string[]
+          is_featured?: boolean
+          is_official?: boolean
+          is_popular?: boolean
+          model_type?: string
+          output_types?: string[]
+          pricing_text?: string
+          pricing_type?: string
+          provider?: string
+          short_description?: string
+          slug: string
+          subcategory_id: string
+          tags?: string[]
+          title: string
+          updated_at?: string
+          use_cases?: string[]
+        }
+        Update: {
+          badge?: string | null
+          category_id?: string
+          created_at?: string
+          features?: string[]
+          full_description?: string
+          id?: string
+          image_url?: string
+          input_types?: string[]
+          is_featured?: boolean
+          is_official?: boolean
+          is_popular?: boolean
+          model_type?: string
+          output_types?: string[]
+          pricing_text?: string
+          pricing_type?: string
+          provider?: string
+          short_description?: string
+          slug?: string
+          subcategory_id?: string
+          tags?: string[]
+          title?: string
+          updated_at?: string
+          use_cases?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tools_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tools_subcategory_id_fkey"
+            columns: ["subcategory_id"]
+            isOneToOne: false
+            referencedRelation: "subcategories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
