@@ -13,6 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/hooks/use-toast';
 import { Loader2, Heart } from 'lucide-react';
 import { useMyDonations } from '@/hooks/useDonations';
+import { useSEO } from '@/hooks/useSEO';
 
 export default function ProfilePage() {
   const { user, loading: authLoading } = useAuth();
