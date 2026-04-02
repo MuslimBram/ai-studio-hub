@@ -1,4 +1,4 @@
-import { Image, Video, Music, MessageSquare, Gamepad2, Briefcase, LucideIcon } from 'lucide-react';
+import { Image, Video, Music, MessageSquare, Gamepad2, Briefcase, Box, LucideIcon } from 'lucide-react';
 
 export const categoryIcons: Record<string, LucideIcon> = {
   Image,
@@ -7,4 +7,5 @@ export const categoryIcons: Record<string, LucideIcon> = {
   MessageSquare,
   Gamepad2,
   Briefcase,
+  Box,
 };
