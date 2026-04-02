@@ -10,6 +10,7 @@ import { useTools } from '@/hooks/useTools';
 import { categoryIcons } from '@/data/icons';
 import { ChevronRight } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useSEO } from '@/hooks/useSEO';
 
 export default function CategoryPage() {
   const { categorySlug } = useParams<{ categorySlug: string }>();
