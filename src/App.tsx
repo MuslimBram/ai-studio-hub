@@ -14,6 +14,11 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ProfilePage from "./pages/ProfilePage";
 import DonatePage from "./pages/DonatePage";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminTools from "./pages/admin/AdminTools";
+import AdminCategories from "./pages/admin/AdminCategories";
+import AdminDonations from "./pages/admin/AdminDonations";
+import AdminUsers from "./pages/admin/AdminUsers";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +41,11 @@ const App = () => (
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/donate" element={<DonatePage />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/tools" element={<AdminTools />} />
+            <Route path="/admin/categories" element={<AdminCategories />} />
+            <Route path="/admin/donations" element={<AdminDonations />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

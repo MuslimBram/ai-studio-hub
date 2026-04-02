@@ -25,15 +25,18 @@ export function DonationCard() {
   const handleDonate = async () => {
     if (!amount || amount < 1) return;
 
+    const baseUrl = window.location.origin;
     const result = await createDonation.mutateAsync({
       amount,
       currency: 'EUR',
       message,
       donor_name: donorName,
+      return_url: `${baseUrl}/donate?status=success`,
+      cancel_url: `${baseUrl}/donate?status=cancelled`,
     });
 
     if (result.approvalUrl) {
-      window.open(result.approvalUrl, '_blank');
+      window.location.href = result.approvalUrl;
     }
   };
 

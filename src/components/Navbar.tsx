@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Zap, Menu, X, User, LogOut, Heart } from 'lucide-react';
+import { Zap, Menu, X, User, LogOut, Heart, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { useIsAdmin } from '@/hooks/useAdmin';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,6 +25,7 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const { user, loading, signOut } = useAuth();
+  const { data: isAdmin } = useIsAdmin();
 
   return (
     <header className="sticky top-0 z-50 border-b bg-card/80 backdrop-blur-lg">
@@ -77,6 +79,14 @@ export function Navbar() {
                       Profili
                     </Link>
                   </DropdownMenuItem>
+                  {isAdmin && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin" className="flex items-center gap-2">
+                        <Shield className="h-4 w-4" />
+                        Admin Panel
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onClick={signOut} className="flex items-center gap-2">
                     <LogOut className="h-4 w-4" />
                     Dilni

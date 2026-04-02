@@ -9,6 +9,8 @@ const BodySchema = z.object({
   currency: z.string().default('EUR'),
   message: z.string().max(500).default(''),
   donor_name: z.string().max(100).default(''),
+  return_url: z.string().url(),
+  cancel_url: z.string().url(),
 });
 
 async function getPayPalAccessToken(): Promise<string> {
@@ -44,7 +46,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { amount, currency, message, donor_name } = parsed.data;
+    const { amount, currency, message, donor_name, return_url, cancel_url } = parsed.data;
 
     // Get user if authenticated
     let userId: string | null = null;
@@ -85,6 +87,8 @@ Deno.serve(async (req) => {
           brand_name: 'AI Tools Hub',
           landing_page: 'BILLING',
           user_action: 'PAY_NOW',
+          return_url,
+          cancel_url,
         },
       }),
     });

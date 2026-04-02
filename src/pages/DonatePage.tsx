@@ -17,12 +17,14 @@ export default function DonatePage() {
   const captureDonation = useCaptureDonation();
 
   // Handle PayPal return
+  const status = searchParams.get('status');
+  const token = searchParams.get('token');
+
   useEffect(() => {
-    const token = searchParams.get('token');
-    if (token && !captureDonation.isSuccess && !captureDonation.isPending) {
+    if (token && status === 'success' && !captureDonation.isSuccess && !captureDonation.isPending) {
       captureDonation.mutate(token);
     }
-  }, [searchParams]);
+  }, [token, status]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -106,6 +108,17 @@ export default function DonatePage() {
                 <Link to="/profile" className="mt-3 inline-block text-sm text-primary hover:underline">
                   Shiko profilin tuaj →
                 </Link>
+              </div>
+            )}
+
+            {/* Cancelled state */}
+            {status === 'cancelled' && (
+              <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-6 text-center">
+                <Heart className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+                <h3 className="text-lg font-bold text-foreground mb-1">Pagesa u anulua</h3>
+                <p className="text-muted-foreground">
+                  Nuk u bë asnjë pagesë. Mund të provoni përsëri kur të dëshironi.
+                </p>
               </div>
             )}
           </div>
