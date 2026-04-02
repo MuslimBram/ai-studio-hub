@@ -59,6 +59,9 @@ export function Navbar() {
 
         {/* Auth area */}
         <div className="hidden md:flex items-center gap-2">
+          <Button variant="ghost" size="sm" asChild className="text-destructive hover:text-destructive">
+            <Link to="/donate"><Heart className="h-4 w-4 mr-1" />Dhuro</Link>
+          </Button>
           {!loading && (
             user ? (
               <DropdownMenu>
