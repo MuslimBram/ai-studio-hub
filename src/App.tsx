@@ -22,6 +22,7 @@ import AdminTools from "./pages/admin/AdminTools";
 import AdminCategories from "./pages/admin/AdminCategories";
 import AdminDonations from "./pages/admin/AdminDonations";
 import AdminUsers from "./pages/admin/AdminUsers";
+import OAuthCallbackPage from "./pages/OAuthCallbackPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
