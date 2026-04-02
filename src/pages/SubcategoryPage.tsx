@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Navbar } from '@/components/Navbar';
+import { Footer } from '@/components/Footer';
 import { SearchBar } from '@/components/SearchBar';
 import { FilterSidebar } from '@/components/FilterSidebar';
 import { ToolCard } from '@/components/ToolCard';
@@ -8,6 +9,7 @@ import { useCategoryBySlug, useSubcategoryBySlug } from '@/hooks/useCategories';
 import { useTools } from '@/hooks/useTools';
 import { ChevronRight } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useSEO } from '@/hooks/useSEO';
 
 export default function SubcategoryPage() {
   const { categorySlug, subcategorySlug } = useParams<{ categorySlug: string; subcategorySlug: string }>();
