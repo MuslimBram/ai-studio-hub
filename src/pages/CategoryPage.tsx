@@ -20,12 +20,18 @@ export default function CategoryPage() {
   const [query, setQuery] = useState('');
   const [pricing, setPricing] = useState('');
   const [provider, setProvider] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+  const handleTagToggle = (tag: string) => {
+    setSelectedTags((prev) => prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]);
+  };
 
   const { data: filteredTools = [], isLoading: toolsLoading } = useTools({
     categoryId: category?.id,
     pricingType: pricing || undefined,
     provider: provider || undefined,
     query: query || undefined,
+    tags: selectedTags.length ? selectedTags : undefined,
   });
 
   useSEO({
@@ -105,6 +111,8 @@ export default function CategoryPage() {
               onPricingChange={setPricing}
               selectedProvider={provider}
               onProviderChange={setProvider}
+              selectedTags={selectedTags}
+              onTagToggle={handleTagToggle}
             />
           </div>
           <div className="flex-1">
