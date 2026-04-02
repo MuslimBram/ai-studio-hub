@@ -87,6 +87,8 @@ Deno.serve(async (req) => {
           brand_name: 'AI Tools Hub',
           landing_page: 'BILLING',
           user_action: 'PAY_NOW',
+          return_url,
+          cancel_url,
         },
       }),
     });
