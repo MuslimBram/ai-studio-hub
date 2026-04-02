@@ -97,7 +97,7 @@ export default function CategoryPage() {
         <SearchBar value={query} onChange={setQuery} placeholder={`Kërko në ${category.name}...`} className="max-w-md mb-8" />
       </div>
 
-      <div className="container pb-20">
+      <div className="container pb-20 flex-1">
         <div className="flex gap-8">
           <div className="hidden lg:block w-56 shrink-0">
             <FilterSidebar
@@ -128,11 +128,7 @@ export default function CategoryPage() {
         </div>
       </div>
 
-      <footer className="border-t bg-card py-8">
-        <div className="container text-center text-sm text-muted-foreground">
-          © 2024 AI Tools Hub. Të gjitha të drejtat e rezervuara.
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
