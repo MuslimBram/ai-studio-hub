@@ -1,13 +1,18 @@
-import { useParams, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { useToolBySlug } from '@/hooks/useTools';
 import { useCategoryById, useSubcategoryById } from '@/hooks/useCategories';
+import { useHasPurchased } from '@/hooks/useToolPurchase';
+import { ToolAccessDialog } from '@/components/ToolAccessDialog';
+import { ToolIframeViewer } from '@/components/ToolIframeViewer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ChevronRight, ExternalLink, Sparkles, Star, Award, Shield, CheckCircle } from 'lucide-react';
+import { ChevronRight, ExternalLink, Sparkles, Star, Award, Shield, CheckCircle, Lock, Play } from 'lucide-react';
 import { useSEO } from '@/hooks/useSEO';
+import { useAuth } from '@/contexts/AuthContext';
 
 const badgeConfig: Record<string, { label: string; icon: React.ReactNode }> = {
   new: { label: 'I ri', icon: <Sparkles className="h-3 w-3" /> },
@@ -18,17 +23,49 @@ const badgeConfig: Record<string, { label: string; icon: React.ReactNode }> = {
 
 export default function ToolPage() {
   const { toolSlug } = useParams<{ toolSlug: string }>();
+  const [searchParams] = useSearchParams();
   const { data: tool, isLoading } = useToolBySlug(toolSlug || '');
   const { data: category } = useCategoryById(tool?.categoryId);
   const { data: subcategory } = useSubcategoryById(tool?.subcategoryId);
+  const { user } = useAuth();
+
+  const toolId = tool?.id || '';
+  const { data: hasPurchased } = useHasPurchased(toolId);
+
+  const [showPayment, setShowPayment] = useState(false);
+  const [showIframe, setShowIframe] = useState(false);
 
   useSEO({
     title: tool?.title,
     description: tool?.shortDescription,
   });
 
-  // Get real website URL from the tool data
   const websiteUrl = (tool as any)?.website_url || '';
+  const basePrice = Number((tool as any)?.base_price || 0);
+  const isPaid = tool?.pricingType !== 'free' && basePrice > 0;
+  const totalPrice = (basePrice + basePrice * 0.5).toFixed(2);
+
+  // If returned from PayPal success with purchased status, open iframe
+  useEffect(() => {
+    if (searchParams.get('purchased') === 'true' && websiteUrl && hasPurchased) {
+      setShowIframe(true);
+    }
+  }, [searchParams, websiteUrl, hasPurchased]);
+
+  const handleAccessClick = () => {
+    if (!isPaid) {
+      // Free tool - open in iframe directly
+      if (websiteUrl) setShowIframe(true);
+      return;
+    }
+    if (hasPurchased) {
+      // Already purchased - open iframe
+      if (websiteUrl) setShowIframe(true);
+      return;
+    }
+    // Show payment dialog
+    setShowPayment(true);
+  };
 
   if (isLoading) {
     return (
@@ -172,21 +209,42 @@ export default function ToolPage() {
               <div className="rounded-xl border bg-card p-6 shadow-card">
                 <div className="mb-4">
                   <span className="text-sm text-muted-foreground">Çmimi</span>
-                  <div className="text-xl font-bold text-foreground">{tool.pricingText}</div>
-                  <span className="text-xs text-muted-foreground capitalize">{tool.pricingType}</span>
+                  {isPaid ? (
+                    <>
+                      <div className="text-xl font-bold text-foreground">{totalPrice}€</div>
+                      <span className="text-xs text-muted-foreground">Pagesë e njëhershme • Akses i përhershëm</span>
+                    </>
+                  ) : (
+                    <>
+                      <div className="text-xl font-bold text-foreground">Falas</div>
+                      <span className="text-xs text-muted-foreground">Akses i lirë</span>
+                    </>
+                  )}
                 </div>
+
                 {websiteUrl ? (
-                  <>
-                    <Button className="w-full mb-3" size="lg" asChild>
-                      <a href={websiteUrl} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="h-4 w-4 mr-2" />
-                        Vizito Faqen
-                      </a>
-                    </Button>
-                  </>
+                  <Button className="w-full" size="lg" onClick={handleAccessClick}>
+                    {isPaid && !hasPurchased ? (
+                      <>
+                        <Lock className="h-4 w-4 mr-2" />
+                        Blej Aksesin • {totalPrice}€
+                      </>
+                    ) : (
+                      <>
+                        <Play className="h-4 w-4 mr-2" />
+                        Hap Mjetin
+                      </>
+                    )}
+                  </Button>
                 ) : (
                   <p className="text-sm text-muted-foreground text-center py-2">
                     Linku i faqes do të shtohet së shpejti.
+                  </p>
+                )}
+
+                {isPaid && hasPurchased && (
+                  <p className="text-xs text-center text-primary mt-2 font-medium">
+                    ✓ Ju keni blerë aksesin
                   </p>
                 )}
               </div>
@@ -217,6 +275,25 @@ export default function ToolPage() {
           </aside>
         </div>
       </div>
+
+      {/* Payment dialog */}
+      {tool && isPaid && (
+        <ToolAccessDialog
+          open={showPayment}
+          onOpenChange={setShowPayment}
+          tool={{ id: tool.id, title: tool.title, base_price: basePrice, pricingType: tool.pricingType }}
+        />
+      )}
+
+      {/* Iframe viewer */}
+      {websiteUrl && (
+        <ToolIframeViewer
+          open={showIframe}
+          onOpenChange={setShowIframe}
+          url={websiteUrl}
+          title={tool.title}
+        />
+      )}
 
       <Footer />
     </div>

@@ -16,6 +16,7 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ProfilePage from "./pages/ProfilePage";
 import DonatePage from "./pages/DonatePage";
+import ToolAccessPage from "./pages/ToolAccessPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminTools from "./pages/admin/AdminTools";
 import AdminCategories from "./pages/admin/AdminCategories";
@@ -44,6 +45,7 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/donate" element={<DonatePage />} />
+            <Route path="/tool-access" element={<ToolAccessPage />} />
 
             {/* Protected routes — require 2FA */}
             <Route path="/profile" element={<MfaGuard><ProfilePage /></MfaGuard>} />
