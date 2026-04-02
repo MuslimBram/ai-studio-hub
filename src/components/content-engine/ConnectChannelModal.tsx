@@ -3,46 +3,23 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ChannelCard, type ChannelStatus } from "./ChannelCard";
-import { channels, type ChannelDefinition } from "./channels-config";
+import { channels, type ChannelDefinition, type ModeDefinition, hasMultipleModes } from "./channels-config";
+import { ModeComparisonStep } from "./ModeComparisonStep";
+import { CredentialsStep } from "./CredentialsStep";
 import { useSocialAccounts } from "@/hooks/useContentEngine";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowLeft, Loader2, CheckCircle2, Search, HelpCircle, ExternalLink, Shield } from "lucide-react";
+import { ArrowLeft, Loader2, Search, HelpCircle, ExternalLink } from "lucide-react";
 
 interface ConnectChannelModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-type Step = "select" | "accountType" | "connect";
-
-const channelFields: Record<string, { label: string; key: string; type?: string; placeholder: string }[]> = {
-  linkedin: [
-    { label: "Emri i Profilit / Kompanisë", key: "account_name", placeholder: "p.sh. Kompania Ime" },
-    { label: "LinkedIn ID", key: "account_id", placeholder: "LinkedIn Organization ID" },
-  ],
-  telegram: [
-    { label: "Emri i Botit", key: "account_name", placeholder: "p.sh. MyBot" },
-    { label: "Bot Token", key: "account_id", placeholder: "123456:ABC-DEF..." },
-  ],
-  whatsapp: [
-    { label: "Numri i Biznesit", key: "account_name", placeholder: "+355..." },
-    { label: "WhatsApp Business API ID", key: "account_id", placeholder: "Phone Number ID" },
-  ],
-  email: [
-    { label: "Emri i llogarisë", key: "account_name", placeholder: "Newsletter" },
-    { label: "Email / SMTP", key: "account_id", placeholder: "info@biznesi.com" },
-  ],
-  custom: [
-    { label: "Emri i kanalit", key: "account_name", placeholder: "Kanali im" },
-    { label: "Webhook URL", key: "account_id", placeholder: "https://..." },
-  ],
-};
+type Step = "select" | "modeCompare" | "connect";
 
 export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalProps) {
   const { user } = useAuth();
@@ -51,17 +28,19 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
 
   const [step, setStep] = useState<Step>("select");
   const [selectedChannel, setSelectedChannel] = useState<ChannelDefinition | null>(null);
-  const [selectedAccountType, setSelectedAccountType] = useState<string>("");
-  const [formData, setFormData] = useState<Record<string, string>>({});
+  const [selectedMode, setSelectedMode] = useState<ModeDefinition | null>(null);
   const [connecting, setConnecting] = useState(false);
   const [search, setSearch] = useState("");
 
-  const getStatus = useCallback((platform: string): ChannelStatus => {
-    const acc = accounts.find((a) => a.platform === platform);
-    if (!acc) return "not_connected";
-    if (acc.is_connected) return "connected";
-    return "reconnect_required";
-  }, [accounts]);
+  const getStatus = useCallback(
+    (platform: string): ChannelStatus => {
+      const acc = accounts.find((a) => a.platform === platform);
+      if (!acc) return "not_connected";
+      if (acc.is_connected) return "connected";
+      return "reconnect_required";
+    },
+    [accounts],
+  );
 
   const filteredChannels = useMemo(() => {
     if (!search.trim()) return channels;
@@ -76,23 +55,31 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
       return;
     }
     setSelectedChannel(ch);
-    setFormData({});
-    setSelectedAccountType("");
+    setSelectedMode(null);
 
-    if (ch.hasAccountTypes) {
-      setStep("accountType");
-    } else if (ch.connectionMethod === "oauth") {
-      initiateOAuth(ch);
+    // If channel has multiple modes, show comparison. Otherwise auto-select the single mode.
+    if (hasMultipleModes(ch)) {
+      setStep("modeCompare");
+    } else {
+      const singleMode = ch.modes[0];
+      handleModeSelected(ch, singleMode);
+    }
+  };
+
+  const handleModeSelected = (ch: ChannelDefinition, mode: ModeDefinition) => {
+    setSelectedMode(mode);
+
+    if (mode.connectionMethod === "oauth") {
+      initiateOAuth(ch, mode);
     } else {
       setStep("connect");
     }
   };
 
-  const initiateOAuth = async (ch: ChannelDefinition, accountType?: string) => {
+  const initiateOAuth = async (ch: ChannelDefinition, mode: ModeDefinition) => {
     setConnecting(true);
     try {
       const redirectUri = `${window.location.origin}/oauth/callback`;
-
       const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/meta-oauth?action=authorize`,
         {
@@ -104,15 +91,13 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
           body: JSON.stringify({
             redirectUri,
             platform: ch.platform,
-            accountType: accountType || "professional",
+            accountType: mode.accountTypes[0] || "professional",
+            connectionMode: mode.mode,
           }),
-        }
+        },
       );
-
       const data = await res.json();
       if (!res.ok || data.error) throw new Error(data.error || "Gabim");
-
-      // Redirect to Meta OAuth
       window.location.href = data.authUrl;
     } catch (err: any) {
       toast.error(err.message || "Gabim gjatë nisjes së autorizimit");
@@ -120,22 +105,14 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
     }
   };
 
-  const handleAccountTypeNext = () => {
-    if (!selectedChannel || !selectedAccountType) {
-      toast.error("Zgjidh tipin e llogarisë");
-      return;
-    }
-    initiateOAuth(selectedChannel, selectedAccountType);
-  };
+  const handleCredentialConnect = async (formData: Record<string, string>) => {
+    if (!selectedChannel || !selectedMode || !user) return;
 
-  const handleCredentialConnect = async () => {
-    if (!selectedChannel || !user) return;
-    const fields = channelFields[selectedChannel.platform] || channelFields.custom;
-    for (const f of fields) {
-      if (!formData[f.key]?.trim()) {
-        toast.error(`Plotëso fushën: ${f.label}`);
-        return;
-      }
+    const accountName = formData.account_name?.trim();
+    const accountId = formData.account_id?.trim();
+    if (!accountName || !accountId) {
+      toast.error("Plotëso të gjitha fushat.");
+      return;
     }
 
     setConnecting(true);
@@ -143,9 +120,12 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
       const { error } = await supabase.from("social_accounts").insert({
         user_id: user.id,
         platform: selectedChannel.platform,
-        account_name: formData.account_name || "",
-        account_id: formData.account_id || "",
+        account_name: accountName,
+        account_id: accountId,
         is_connected: true,
+        connection_mode: selectedMode.mode,
+        account_type: selectedMode.accountTypes[0] || "unknown",
+        capabilities: selectedMode.capabilities,
       });
       if (error) throw error;
       qc.invalidateQueries({ queryKey: ["social-accounts"] });
@@ -161,23 +141,37 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
   const resetAndClose = () => {
     setStep("select");
     setSelectedChannel(null);
-    setSelectedAccountType("");
-    setFormData({});
+    setSelectedMode(null);
     setSearch("");
     setConnecting(false);
     onOpenChange(false);
   };
 
   const goBack = () => {
-    if (step === "connect" || step === "accountType") {
+    if (step === "connect" && selectedChannel && hasMultipleModes(selectedChannel)) {
+      setStep("modeCompare");
+      setSelectedMode(null);
+    } else {
       setStep("select");
       setSelectedChannel(null);
-      setSelectedAccountType("");
+      setSelectedMode(null);
     }
   };
 
+  const stepTitle = () => {
+    if (step === "select") return "Lidh një kanal të ri";
+    if (step === "modeCompare") return `Zgjidh modalitetin — ${selectedChannel?.name}`;
+    return `Lidh ${selectedChannel?.name}`;
+  };
+
+  const stepDescription = () => {
+    if (step === "select") return "Zgjidh kanalin që dëshiron të lidhësh.";
+    if (step === "modeCompare") return "Krahaso veçoritë dhe zgjidh mënyrën e lidhjes.";
+    return `Vendos kredencialet për ${selectedChannel?.name}.`;
+  };
+
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v) resetAndClose(); else onOpenChange(v); }}>
+    <Dialog open={open} onOpenChange={(v) => (v ? onOpenChange(v) : resetAndClose())}>
       <DialogContent className="max-w-2xl max-h-[85vh] p-0 gap-0 overflow-hidden">
         <DialogHeader className="px-6 pt-6 pb-4 border-b">
           <div className="flex items-center gap-3">
@@ -187,20 +181,13 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
               </Button>
             )}
             <div>
-              <DialogTitle className="text-xl">
-                {step === "select" && "Lidh një kanal të ri"}
-                {step === "accountType" && `Zgjidh tipin — ${selectedChannel?.name}`}
-                {step === "connect" && `Lidh ${selectedChannel?.name}`}
-              </DialogTitle>
-              <DialogDescription className="mt-1">
-                {step === "select" && "Zgjidh kanalin që dëshiron të lidhësh me llogarinë tënde."}
-                {step === "accountType" && "Zgjidh tipin e llogarisë për të parë veçoritë e mbështetura."}
-                {step === "connect" && `Vendos kredencialet për ${selectedChannel?.name}.`}
-              </DialogDescription>
+              <DialogTitle className="text-xl">{stepTitle()}</DialogTitle>
+              <DialogDescription className="mt-1">{stepDescription()}</DialogDescription>
             </div>
           </div>
         </DialogHeader>
 
+        {/* Step: Channel selection grid */}
         {step === "select" && (
           <div className="flex flex-col overflow-hidden">
             <div className="px-6 pt-4 pb-2">
@@ -239,99 +226,26 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
           </div>
         )}
 
-        {step === "accountType" && selectedChannel?.accountTypes && (
-          <ScrollArea className="px-6 py-6" style={{ maxHeight: "calc(85vh - 160px)" }}>
-            <div className="space-y-5">
-              {/* Channel header */}
-              <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/50 border">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-background">
-                  <selectedChannel.icon className={`h-5 w-5 ${selectedChannel.iconColor}`} />
-                </div>
-                <div>
-                  <p className="font-medium text-sm">{selectedChannel.name}</p>
-                  <p className="text-xs text-muted-foreground">{selectedChannel.subtitle}</p>
-                </div>
-              </div>
-
-              {/* OAuth security note */}
-              <div className="flex items-start gap-2 p-3 rounded-lg bg-primary/5 border border-primary/20">
-                <Shield className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                <p className="text-xs text-muted-foreground">
-                  Do të ridrejtohesh te Meta për autorizim. Nuk ruajmë fjalëkalimin tënd — vetëm token-in e autorizuar.
-                </p>
-              </div>
-
-              {/* Account type selection */}
-              <RadioGroup value={selectedAccountType} onValueChange={setSelectedAccountType} className="space-y-3">
-                {selectedChannel.accountTypes.map((at) => (
-                  <label
-                    key={at.value}
-                    className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-colors ${
-                      selectedAccountType === at.value ? "border-primary bg-primary/5" : "hover:bg-muted/50"
-                    }`}
-                  >
-                    <RadioGroupItem value={at.value} className="mt-0.5" />
-                    <div>
-                      <p className="font-medium text-sm">{at.label}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{at.description}</p>
-                    </div>
-                  </label>
-                ))}
-              </RadioGroup>
-
-              <Button
-                onClick={handleAccountTypeNext}
-                disabled={!selectedAccountType || connecting}
-                className="w-full"
-                size="lg"
-              >
-                {connecting ? (
-                  <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Duke u ridrejtuar...</>
-                ) : (
-                  <><ExternalLink className="h-4 w-4 mr-2" />Vazhdo me autorizimin</>
-                )}
-              </Button>
-            </div>
+        {/* Step: Mode comparison */}
+        {step === "modeCompare" && selectedChannel && (
+          <ScrollArea style={{ maxHeight: "calc(85vh - 120px)" }}>
+            <ModeComparisonStep
+              channel={selectedChannel}
+              onSelectMode={(mode) => handleModeSelected(selectedChannel, mode)}
+              connecting={connecting}
+            />
           </ScrollArea>
         )}
 
-        {step === "connect" && (
-          <ScrollArea className="px-6 py-6" style={{ maxHeight: "calc(85vh - 160px)" }}>
-            <div className="space-y-5">
-              {selectedChannel && (
-                <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/50 border">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-background">
-                    <selectedChannel.icon className={`h-5 w-5 ${selectedChannel.iconColor}`} />
-                  </div>
-                  <div>
-                    <p className="font-medium text-sm">{selectedChannel.name}</p>
-                    <p className="text-xs text-muted-foreground">{selectedChannel.subtitle}</p>
-                  </div>
-                </div>
-              )}
-
-              {(channelFields[selectedChannel?.platform || ""] || channelFields.custom).map((field) => (
-                <div key={field.key} className="space-y-2">
-                  <Label htmlFor={field.key}>{field.label}</Label>
-                  <Input
-                    id={field.key}
-                    type={field.type || "text"}
-                    placeholder={field.placeholder}
-                    value={formData[field.key] || ""}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, [field.key]: e.target.value }))}
-                    disabled={connecting}
-                  />
-                </div>
-              ))}
-
-              <Button onClick={handleCredentialConnect} disabled={connecting} className="w-full" size="lg">
-                {connecting ? (
-                  <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Duke u lidhur...</>
-                ) : (
-                  <><CheckCircle2 className="h-4 w-4 mr-2" />Lidh {selectedChannel?.name}</>
-                )}
-              </Button>
-            </div>
+        {/* Step: Credentials form */}
+        {step === "connect" && selectedChannel && selectedMode && (
+          <ScrollArea style={{ maxHeight: "calc(85vh - 120px)" }}>
+            <CredentialsStep
+              channel={selectedChannel}
+              selectedMode={selectedMode}
+              onConnect={handleCredentialConnect}
+              connecting={connecting}
+            />
           </ScrollArea>
         )}
       </DialogContent>
