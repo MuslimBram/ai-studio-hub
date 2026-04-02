@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Navbar } from '@/components/Navbar';
+import { Footer } from '@/components/Footer';
 import { SearchBar } from '@/components/SearchBar';
 import { FilterSidebar } from '@/components/FilterSidebar';
 import { ToolCard } from '@/components/ToolCard';
@@ -8,6 +9,7 @@ import { useCategoryBySlug, useSubcategoryBySlug } from '@/hooks/useCategories';
 import { useTools } from '@/hooks/useTools';
 import { ChevronRight } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useSEO } from '@/hooks/useSEO';
 
 export default function SubcategoryPage() {
   const { categorySlug, subcategorySlug } = useParams<{ categorySlug: string; subcategorySlug: string }>();
@@ -49,8 +51,13 @@ export default function SubcategoryPage() {
     );
   }
 
+  useSEO({
+    title: `${subcategory.name} — ${category.name}`,
+    description: subcategory.description || `Mjete AI për ${subcategory.name}`,
+  });
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
 
       <div className="container pt-6">
@@ -69,7 +76,7 @@ export default function SubcategoryPage() {
         <SearchBar value={query} onChange={setQuery} placeholder={`Kërko në ${subcategory.name}...`} className="max-w-md mb-8" />
       </div>
 
-      <div className="container pb-20">
+      <div className="container pb-20 flex-1">
         <div className="flex gap-8">
           <div className="hidden lg:block w-56 shrink-0">
             <FilterSidebar
@@ -100,11 +107,7 @@ export default function SubcategoryPage() {
         </div>
       </div>
 
-      <footer className="border-t bg-card py-8">
-        <div className="container text-center text-sm text-muted-foreground">
-          © 2024 AI Tools Hub. Të gjitha të drejtat e rezervuara.
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

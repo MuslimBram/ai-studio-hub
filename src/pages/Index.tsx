@@ -1,14 +1,15 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { SearchBar } from '@/components/SearchBar';
 import { CategoryCard } from '@/components/CategoryCard';
 import { ToolSection } from '@/components/ToolSection';
 import { Navbar } from '@/components/Navbar';
+import { Footer } from '@/components/Footer';
 import { ToolCard } from '@/components/ToolCard';
 import { Sparkles } from 'lucide-react';
 import { useCategories } from '@/hooks/useCategories';
 import { useTools, useSearchTools } from '@/hooks/useTools';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useSEO } from '@/hooks/useSEO';
 
 export default function Index() {
   const [query, setQuery] = useState('');
@@ -19,8 +20,12 @@ export default function Index() {
   const { data: newTools = [] } = useTools({ orderByCreated: true, limit: 8 });
   const { data: officialTools = [] } = useTools({ official: true });
 
+  useSEO({
+    description: 'Eksploro, krahaso dhe provo qindra mjete inteligjence artificiale për foto, video, audio, tekst, lojra dhe biznes. Falas për të gjithë.',
+  });
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
 
       {/* Hero */}
@@ -46,7 +51,7 @@ export default function Index() {
         </div>
       </section>
 
-      <main className="container pb-20">
+      <main className="container pb-20 flex-1">
         {/* Search results */}
         {query.length > 1 && (
           <section className="py-8">
@@ -95,11 +100,7 @@ export default function Index() {
         )}
       </main>
 
-      <footer className="border-t bg-card py-8">
-        <div className="container text-center text-sm text-muted-foreground">
-          © 2024 AI Tools Hub. Të gjitha të drejtat e rezervuara.
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

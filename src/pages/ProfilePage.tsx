@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navbar } from '@/components/Navbar';
 import { DonorBadge } from '@/components/DonorBadge';
+import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -12,6 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/hooks/use-toast';
 import { Loader2, Heart } from 'lucide-react';
 import { useMyDonations } from '@/hooks/useDonations';
+import { useSEO } from '@/hooks/useSEO';
 
 export default function ProfilePage() {
   const { user, loading: authLoading } = useAuth();
@@ -23,6 +25,8 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const { data: myDonations } = useMyDonations();
+
+  useSEO({ title: 'Profili Im' });
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -77,9 +81,9 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
-      <div className="container py-12 max-w-lg">
+      <div className="container py-12 max-w-lg flex-1">
         <div className="flex items-center gap-3 mb-8">
           <h1 className="text-2xl font-bold text-foreground">Profili Im</h1>
           {isDonor && <DonorBadge totalDonated={totalDonated} size="md" />}
@@ -144,6 +148,8 @@ export default function ProfilePage() {
           )}
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }

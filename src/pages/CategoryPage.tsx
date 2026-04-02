@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Navbar } from '@/components/Navbar';
+import { Footer } from '@/components/Footer';
 import { SearchBar } from '@/components/SearchBar';
 import { FilterSidebar } from '@/components/FilterSidebar';
 import { ToolCard } from '@/components/ToolCard';
@@ -9,6 +10,7 @@ import { useTools } from '@/hooks/useTools';
 import { categoryIcons } from '@/data/icons';
 import { ChevronRight } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useSEO } from '@/hooks/useSEO';
 
 export default function CategoryPage() {
   const { categorySlug } = useParams<{ categorySlug: string }>();
@@ -52,8 +54,13 @@ export default function CategoryPage() {
 
   const Icon = categoryIcons[category.icon];
 
+  useSEO({
+    title: category.name,
+    description: category.description || `Eksploro mjetet AI për ${category.name}`,
+  });
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
 
       <div className="container pt-6">
@@ -90,7 +97,7 @@ export default function CategoryPage() {
         <SearchBar value={query} onChange={setQuery} placeholder={`Kërko në ${category.name}...`} className="max-w-md mb-8" />
       </div>
 
-      <div className="container pb-20">
+      <div className="container pb-20 flex-1">
         <div className="flex gap-8">
           <div className="hidden lg:block w-56 shrink-0">
             <FilterSidebar
@@ -121,11 +128,7 @@ export default function CategoryPage() {
         </div>
       </div>
 
-      <footer className="border-t bg-card py-8">
-        <div className="container text-center text-sm text-muted-foreground">
-          © 2024 AI Tools Hub. Të gjitha të drejtat e rezervuara.
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Navbar } from '@/components/Navbar';
+import { Footer } from '@/components/Footer';
 import { DonationCard } from '@/components/DonationCard';
 import { useDonationStats, useCaptureDonation } from '@/hooks/useDonations';
 import { Heart, Users, TrendingUp, CheckCircle, Sparkles, Shield, Zap } from 'lucide-react';
+import { useSEO } from '@/hooks/useSEO';
 
 const bonusFeatures = [
   { icon: Sparkles, title: 'Badge Donatori', desc: 'Badge speciale në profilin tuaj që tregon mbështetjen' },
@@ -16,7 +18,11 @@ export default function DonatePage() {
   const [searchParams] = useSearchParams();
   const captureDonation = useCaptureDonation();
 
-  // Handle PayPal return
+  useSEO({
+    title: 'Dhuro',
+    description: 'Mbështetni AI Tools Hub me një donacion përmes PayPal. Platforma është falas për të gjithë.',
+  });
+
   const status = searchParams.get('status');
   const token = searchParams.get('token');
 
@@ -27,7 +33,7 @@ export default function DonatePage() {
   }, [token, status]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
 
       {/* Hero */}
@@ -65,14 +71,12 @@ export default function DonatePage() {
       )}
 
       {/* Content */}
-      <div className="container py-12">
+      <div className="container py-12 flex-1">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
-          {/* Left - Donation form */}
           <div>
             <DonationCard />
           </div>
 
-          {/* Right - Bonus features */}
           <div className="space-y-6">
             <div>
               <h2 className="text-xl font-bold text-foreground mb-2">
@@ -97,7 +101,6 @@ export default function DonatePage() {
               ))}
             </div>
 
-            {/* Success state */}
             {captureDonation.isSuccess && (
               <div className="rounded-xl border border-primary/30 bg-primary/5 p-6 text-center">
                 <CheckCircle className="h-10 w-10 text-primary mx-auto mb-3" />
@@ -111,7 +114,6 @@ export default function DonatePage() {
               </div>
             )}
 
-            {/* Cancelled state */}
             {status === 'cancelled' && (
               <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-6 text-center">
                 <Heart className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
@@ -125,11 +127,7 @@ export default function DonatePage() {
         </div>
       </div>
 
-      <footer className="border-t bg-card py-8">
-        <div className="container text-center text-sm text-muted-foreground">
-          © 2024 AI Tools Hub. Të gjitha të drejtat e rezervuara.
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

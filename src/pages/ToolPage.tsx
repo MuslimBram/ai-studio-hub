@@ -1,5 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
 import { Navbar } from '@/components/Navbar';
+import { Footer } from '@/components/Footer';
 import { useToolBySlug } from '@/hooks/useTools';
 import { useCategoryById, useSubcategoryById } from '@/hooks/useCategories';
 import { Button } from '@/components/ui/button';
@@ -7,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ChevronRight, ExternalLink, Sparkles, Star, Award, Shield, CheckCircle, Clock } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { useSEO } from '@/hooks/useSEO';
 
 const badgeConfig: Record<string, { label: string; icon: React.ReactNode }> = {
   new: { label: 'I ri', icon: <Sparkles className="h-3 w-3" /> },
@@ -20,6 +22,11 @@ export default function ToolPage() {
   const { data: tool, isLoading } = useToolBySlug(toolSlug || '');
   const { data: category } = useCategoryById(tool?.categoryId);
   const { data: subcategory } = useSubcategoryById(tool?.subcategoryId);
+
+  useSEO({
+    title: tool?.title,
+    description: tool?.shortDescription,
+  });
 
   const handleTryNow = () => {
     toast({
@@ -37,25 +44,27 @@ export default function ToolPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background flex flex-col">
         <Navbar />
-        <div className="container py-20">
+        <div className="container py-20 flex-1">
           <Skeleton className="h-10 w-64 mb-4" />
           <Skeleton className="h-6 w-96 mb-8" />
           <Skeleton className="h-96 rounded-xl" />
         </div>
+        <Footer />
       </div>
     );
   }
 
   if (!tool) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background flex flex-col">
         <Navbar />
-        <div className="container py-20 text-center">
+        <div className="container py-20 text-center flex-1">
           <h1 className="text-2xl font-bold text-foreground">Mjeti nuk u gjet</h1>
           <Link to="/" className="mt-4 text-primary hover:underline">Kthehu në kryefaqje</Link>
         </div>
+        <Footer />
       </div>
     );
   }
@@ -63,11 +72,11 @@ export default function ToolPage() {
   const badge = tool.badge ? badgeConfig[tool.badge] : null;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
 
       <div className="container pt-6">
-        <nav className="flex items-center gap-2 text-sm text-muted-foreground">
+        <nav className="flex items-center gap-2 text-sm text-muted-foreground" aria-label="Breadcrumb">
           <Link to="/" className="hover:text-foreground transition-colors">Kryefaqja</Link>
           <ChevronRight className="h-3 w-3" />
           {category ? (
@@ -86,10 +95,10 @@ export default function ToolPage() {
         </nav>
       </div>
 
-      <div className="container py-8">
+      <div className="container py-8 flex-1">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-8">
-            <div className="rounded-xl border bg-card p-8 shadow-card">
+            <article className="rounded-xl border bg-card p-8 shadow-card">
               <div className="flex items-start gap-4 mb-6">
                 <div className="h-16 w-16 rounded-xl bg-secondary flex items-center justify-center text-2xl font-bold text-muted-foreground/30">
                   {tool.title.slice(0, 2)}
@@ -113,10 +122,10 @@ export default function ToolPage() {
               </div>
 
               <p className="text-foreground leading-relaxed">{tool.fullDescription}</p>
-            </div>
+            </article>
 
             {tool.features.length > 0 && (
-              <div className="rounded-xl border bg-card p-8 shadow-card">
+              <section className="rounded-xl border bg-card p-8 shadow-card">
                 <h2 className="text-xl font-bold text-foreground mb-4">Veçoritë</h2>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {tool.features.map((f, i) => (
@@ -126,21 +135,21 @@ export default function ToolPage() {
                     </div>
                   ))}
                 </div>
-              </div>
+              </section>
             )}
 
             {tool.useCases.length > 0 && (
-              <div className="rounded-xl border bg-card p-8 shadow-card">
+              <section className="rounded-xl border bg-card p-8 shadow-card">
                 <h2 className="text-xl font-bold text-foreground mb-4">Përdorime</h2>
                 <div className="flex flex-wrap gap-2">
                   {tool.useCases.map((uc, i) => (
                     <span key={i} className="rounded-full bg-secondary px-3 py-1.5 text-sm text-foreground">{uc}</span>
                   ))}
                 </div>
-              </div>
+              </section>
             )}
 
-            <div className="rounded-xl border bg-card p-8 shadow-card">
+            <section className="rounded-xl border bg-card p-8 shadow-card">
               <h2 className="text-xl font-bold text-foreground mb-4">Input / Output</h2>
               <div className="grid grid-cols-2 gap-6">
                 <div>
@@ -156,21 +165,21 @@ export default function ToolPage() {
                   </div>
                 </div>
               </div>
-            </div>
+            </section>
 
             {tool.tags.length > 0 && (
-              <div className="rounded-xl border bg-card p-8 shadow-card">
+              <section className="rounded-xl border bg-card p-8 shadow-card">
                 <h2 className="text-xl font-bold text-foreground mb-4">Tags</h2>
                 <div className="flex flex-wrap gap-2">
                   {tool.tags.map((tag, i) => (
                     <span key={i} className="rounded-md bg-muted px-2.5 py-1 text-xs text-muted-foreground">#{tag}</span>
                   ))}
                 </div>
-              </div>
+              </section>
             )}
           </div>
 
-          <div className="space-y-6">
+          <aside className="space-y-6">
             <div className="sticky top-24 space-y-6">
               <div className="rounded-xl border bg-card p-6 shadow-card">
                 <div className="mb-4">
@@ -211,15 +220,11 @@ export default function ToolPage() {
                 </div>
               </div>
             </div>
-          </div>
+          </aside>
         </div>
       </div>
 
-      <footer className="border-t bg-card py-8 mt-10">
-        <div className="container text-center text-sm text-muted-foreground">
-          © 2024 AI Tools Hub. Të gjitha të drejtat e rezervuara.
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
