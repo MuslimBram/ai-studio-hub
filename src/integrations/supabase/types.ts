@@ -466,14 +466,24 @@ export type Database = {
           account_id: string
           account_name: string
           account_type: string
+          business_id: string | null
           capabilities: string[]
+          capabilities_json: Json
+          channel_type: string
           connection_mode: string
           created_at: string
+          display_name: string
+          external_account_id: string
+          handle_or_address: string
           id: string
           is_connected: boolean
+          is_primary: boolean
+          metadata_json: Json
           platform: string
+          provider: string
           provider_metadata: Json
           refresh_token: string | null
+          status: string
           token_expires_at: string | null
           updated_at: string
           user_id: string
@@ -483,14 +493,24 @@ export type Database = {
           account_id?: string
           account_name?: string
           account_type?: string
+          business_id?: string | null
           capabilities?: string[]
+          capabilities_json?: Json
+          channel_type?: string
           connection_mode?: string
           created_at?: string
+          display_name?: string
+          external_account_id?: string
+          handle_or_address?: string
           id?: string
           is_connected?: boolean
+          is_primary?: boolean
+          metadata_json?: Json
           platform: string
+          provider?: string
           provider_metadata?: Json
           refresh_token?: string | null
+          status?: string
           token_expires_at?: string | null
           updated_at?: string
           user_id: string
@@ -500,14 +520,24 @@ export type Database = {
           account_id?: string
           account_name?: string
           account_type?: string
+          business_id?: string | null
           capabilities?: string[]
+          capabilities_json?: Json
+          channel_type?: string
           connection_mode?: string
           created_at?: string
+          display_name?: string
+          external_account_id?: string
+          handle_or_address?: string
           id?: string
           is_connected?: boolean
+          is_primary?: boolean
+          metadata_json?: Json
           platform?: string
+          provider?: string
           provider_metadata?: Json
           refresh_token?: string | null
+          status?: string
           token_expires_at?: string | null
           updated_at?: string
           user_id?: string
@@ -789,6 +819,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      count_active_channel_accounts: {
+        Args: { _user_id: string }
+        Returns: number
+      }
       get_ai_usage_today: {
         Args: { _user_id: string }
         Returns: {
@@ -804,6 +838,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_admin_user: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
