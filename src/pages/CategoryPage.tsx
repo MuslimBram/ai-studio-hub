@@ -28,6 +28,11 @@ export default function CategoryPage() {
     query: query || undefined,
   });
 
+  useSEO({
+    title: category?.name,
+    description: category?.description || undefined,
+  });
+
   if (catLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -53,11 +58,6 @@ export default function CategoryPage() {
   }
 
   const Icon = categoryIcons[category.icon];
-
-  useSEO({
-    title: category.name,
-    description: category.description || `Eksploro mjetet AI për ${category.name}`,
-  });
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
