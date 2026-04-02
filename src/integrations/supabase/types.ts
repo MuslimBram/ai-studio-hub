@@ -228,9 +228,49 @@ export type Database = {
           },
         ]
       }
+      tool_purchases: {
+        Row: {
+          amount: number
+          commission: number
+          created_at: string
+          id: string
+          paypal_order_id: string | null
+          paypal_payer_id: string | null
+          status: string
+          tool_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          commission: number
+          created_at?: string
+          id?: string
+          paypal_order_id?: string | null
+          paypal_payer_id?: string | null
+          status?: string
+          tool_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          commission?: number
+          created_at?: string
+          id?: string
+          paypal_order_id?: string | null
+          paypal_payer_id?: string | null
+          status?: string
+          tool_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       tools: {
         Row: {
           badge: string | null
+          base_price: number
           category_id: string
           created_at: string
           features: string[]
@@ -257,6 +297,7 @@ export type Database = {
         }
         Insert: {
           badge?: string | null
+          base_price?: number
           category_id: string
           created_at?: string
           features?: string[]
@@ -283,6 +324,7 @@ export type Database = {
         }
         Update: {
           badge?: string | null
+          base_price?: number
           category_id?: string
           created_at?: string
           features?: string[]
