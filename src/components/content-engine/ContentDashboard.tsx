@@ -40,7 +40,13 @@ export function ContentDashboard() {
         ))}
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid md:grid-cols-3 gap-6">
+        <Card>
+          <CardHeader><CardTitle className="text-lg">Përdorimi AI</CardTitle></CardHeader>
+          <CardContent>
+            <AiUsageMeter />
+          </CardContent>
+        </Card>
         <Card>
           <CardHeader><CardTitle className="text-lg">Postimet e ardhshme</CardTitle></CardHeader>
           <CardContent>
