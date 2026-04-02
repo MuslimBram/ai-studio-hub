@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useScheduledPosts, usePublishedPosts, useSocialAccounts, useContentSuggestions } from "@/hooks/useContentEngine";
 import { CalendarDays, FileText, TrendingUp, Users, Zap, BarChart3 } from "lucide-react";
+import { AiUsageMeter } from "@/components/AiUsageMeter";
 
 export function ContentDashboard() {
   const { data: scheduled = [] } = useScheduledPosts();
@@ -39,7 +40,13 @@ export function ContentDashboard() {
         ))}
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid md:grid-cols-3 gap-6">
+        <Card>
+          <CardHeader><CardTitle className="text-lg">Përdorimi AI</CardTitle></CardHeader>
+          <CardContent>
+            <AiUsageMeter />
+          </CardContent>
+        </Card>
         <Card>
           <CardHeader><CardTitle className="text-lg">Postimet e ardhshme</CardTitle></CardHeader>
           <CardContent>
