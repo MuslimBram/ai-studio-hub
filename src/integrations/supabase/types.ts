@@ -53,13 +53,61 @@ export type Database = {
         }
         Relationships: []
       }
+      donations: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          donor_name: string | null
+          email: string
+          id: string
+          message: string | null
+          paypal_order_id: string | null
+          paypal_payer_id: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          donor_name?: string | null
+          email: string
+          id?: string
+          message?: string | null
+          paypal_order_id?: string | null
+          paypal_payer_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          donor_name?: string | null
+          email?: string
+          id?: string
+          message?: string | null
+          paypal_order_id?: string | null
+          paypal_payer_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string
           bio: string
           created_at: string
           display_name: string
+          donor_since: string | null
           id: string
+          is_donor: boolean
+          total_donated: number
           updated_at: string
         }
         Insert: {
@@ -67,7 +115,10 @@ export type Database = {
           bio?: string
           created_at?: string
           display_name?: string
+          donor_since?: string | null
           id: string
+          is_donor?: boolean
+          total_donated?: number
           updated_at?: string
         }
         Update: {
@@ -75,7 +126,10 @@ export type Database = {
           bio?: string
           created_at?: string
           display_name?: string
+          donor_since?: string | null
           id?: string
+          is_donor?: boolean
+          total_donated?: number
           updated_at?: string
         }
         Relationships: []
