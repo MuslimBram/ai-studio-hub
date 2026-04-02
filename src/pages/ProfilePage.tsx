@@ -149,6 +149,12 @@ export default function ProfilePage() {
             </div>
           )}
         </div>
+
+        {/* 2FA Security */}
+        <div className="mt-8">
+          <h2 className="text-lg font-bold text-foreground mb-4">Siguria</h2>
+          <MfaStatus />
+        </div>
       </div>
 
       <Footer />
