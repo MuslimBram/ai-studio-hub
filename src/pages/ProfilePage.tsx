@@ -14,6 +14,8 @@ import { toast } from '@/hooks/use-toast';
 import { Loader2, Heart } from 'lucide-react';
 import { useMyDonations } from '@/hooks/useDonations';
 import { useSEO } from '@/hooks/useSEO';
+import { MfaSetup } from '@/components/MfaSetup';
+import { MfaStatus } from '@/components/MfaStatus';
 
 export default function ProfilePage() {
   const { user, loading: authLoading } = useAuth();
@@ -146,6 +148,12 @@ export default function ProfilePage() {
               </Link>
             </div>
           )}
+        </div>
+
+        {/* 2FA Security */}
+        <div className="mt-8">
+          <h2 className="text-lg font-bold text-foreground mb-4">Siguria</h2>
+          <MfaStatus />
         </div>
       </div>
 

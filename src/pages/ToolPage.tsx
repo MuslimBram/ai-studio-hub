@@ -6,8 +6,7 @@ import { useCategoryById, useSubcategoryById } from '@/hooks/useCategories';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ChevronRight, ExternalLink, Sparkles, Star, Award, Shield, CheckCircle, Clock } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
+import { ChevronRight, ExternalLink, Sparkles, Star, Award, Shield, CheckCircle } from 'lucide-react';
 import { useSEO } from '@/hooks/useSEO';
 
 const badgeConfig: Record<string, { label: string; icon: React.ReactNode }> = {
@@ -28,19 +27,8 @@ export default function ToolPage() {
     description: tool?.shortDescription,
   });
 
-  const handleTryNow = () => {
-    toast({
-      title: 'Së shpejti!',
-      description: `Integrimi me ${tool?.provider || 'këtë mjet'} do të jetë i disponueshëm së shpejti.`,
-    });
-  };
-
-  const handleLearnMore = () => {
-    toast({
-      title: 'Së shpejti!',
-      description: 'Dokumentacioni i detajuar do të shtohet së shpejti.',
-    });
-  };
+  // Get real website URL from the tool data
+  const websiteUrl = (tool as any)?.website_url || '';
 
   if (isLoading) {
     return (
@@ -187,14 +175,20 @@ export default function ToolPage() {
                   <div className="text-xl font-bold text-foreground">{tool.pricingText}</div>
                   <span className="text-xs text-muted-foreground capitalize">{tool.pricingType}</span>
                 </div>
-                <Button className="w-full mb-3" size="lg" onClick={handleTryNow}>
-                  <Clock className="h-4 w-4 mr-2" />
-                  Së Shpejti
-                </Button>
-                <Button variant="outline" className="w-full" size="lg" onClick={handleLearnMore}>
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  Mëso Më Shumë
-                </Button>
+                {websiteUrl ? (
+                  <>
+                    <Button className="w-full mb-3" size="lg" asChild>
+                      <a href={websiteUrl} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="h-4 w-4 mr-2" />
+                        Vizito Faqen
+                      </a>
+                    </Button>
+                  </>
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-2">
+                    Linku i faqes do të shtohet së shpejti.
+                  </p>
+                )}
               </div>
 
               <div className="rounded-xl border bg-card p-6 shadow-card space-y-4">

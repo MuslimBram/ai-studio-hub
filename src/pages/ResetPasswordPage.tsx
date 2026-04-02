@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Navbar } from '@/components/Navbar';
+import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
+import { useSEO } from '@/hooks/useSEO';
 import { Loader2 } from 'lucide-react';
 
 export default function ResetPasswordPage() {
@@ -14,8 +16,9 @@ export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
 
+  useSEO({ title: 'Fjalëkalim i Ri', description: 'Vendosni fjalëkalimin e ri për llogarinë tuaj.' });
+
   useEffect(() => {
-    // Check for recovery event
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') {
         setReady(true);
@@ -42,9 +45,9 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
-      <div className="container flex items-center justify-center py-20">
+      <div className="container flex items-center justify-center py-20 flex-1">
         <div className="w-full max-w-md rounded-xl border bg-card p-8 shadow-card">
           <h1 className="mb-6 text-2xl font-bold text-foreground text-center">Fjalëkalim i Ri</h1>
           {!ready ? (
@@ -63,6 +66,7 @@ export default function ResetPasswordPage() {
           )}
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
