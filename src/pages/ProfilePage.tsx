@@ -148,6 +148,8 @@ export default function ProfilePage() {
           )}
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }
