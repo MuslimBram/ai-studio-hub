@@ -378,10 +378,14 @@ export type Database = {
           access_token: string
           account_id: string
           account_name: string
+          account_type: string
+          capabilities: string[]
+          connection_mode: string
           created_at: string
           id: string
           is_connected: boolean
           platform: string
+          provider_metadata: Json
           refresh_token: string | null
           token_expires_at: string | null
           updated_at: string
@@ -391,10 +395,14 @@ export type Database = {
           access_token?: string
           account_id?: string
           account_name?: string
+          account_type?: string
+          capabilities?: string[]
+          connection_mode?: string
           created_at?: string
           id?: string
           is_connected?: boolean
           platform: string
+          provider_metadata?: Json
           refresh_token?: string | null
           token_expires_at?: string | null
           updated_at?: string
@@ -404,10 +412,14 @@ export type Database = {
           access_token?: string
           account_id?: string
           account_name?: string
+          account_type?: string
+          capabilities?: string[]
+          connection_mode?: string
           created_at?: string
           id?: string
           is_connected?: boolean
           platform?: string
+          provider_metadata?: Json
           refresh_token?: string | null
           token_expires_at?: string | null
           updated_at?: string
