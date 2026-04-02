@@ -36,16 +36,14 @@ export default function OAuthCallbackPage() {
   const exchangeCode = async (code: string, stateB64: string) => {
     try {
       const redirectUri = `${window.location.origin}/oauth/callback`;
-
-      const { data, error } = await supabase.functions.invoke("meta-oauth", {
-        body: { code, redirectUri, state: stateB64 },
-        headers: { "Content-Type": "application/json" },
-      });
-
-      // Append action=callback query param
-      const fnUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/meta-oauth?action=callback`;
       const session = await supabase.auth.getSession();
       const token = session.data.session?.access_token;
+
+      if (!token) {
+        throw new Error("Nuk je i kyçur. Kyçu dhe provo përsëri.");
+      }
+
+      const fnUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/meta-oauth?action=callback`;
 
       const res = await fetch(fnUrl, {
         method: "POST",
@@ -85,7 +83,9 @@ export default function OAuthCallbackPage() {
 
         {status === "success" && (
           <>
-            <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 mx-auto">
+              <CheckCircle2 className="h-7 w-7 text-primary" />
+            </div>
             <h1 className="text-xl font-semibold text-foreground">{message}</h1>
             {accountName && (
               <p className="text-muted-foreground">Llogaria: <strong>{accountName}</strong></p>
@@ -98,15 +98,14 @@ export default function OAuthCallbackPage() {
 
         {status === "error" && (
           <>
-            <XCircle className="h-12 w-12 text-destructive mx-auto" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 mx-auto">
+              <XCircle className="h-7 w-7 text-destructive" />
+            </div>
             <h1 className="text-xl font-semibold text-foreground">Lidhja dështoi</h1>
             <p className="text-muted-foreground">{message}</p>
             <div className="flex gap-3 justify-center mt-4">
               <Button variant="outline" onClick={() => navigate("/content-engine")}>
                 Kthehu
-              </Button>
-              <Button onClick={() => window.location.reload()}>
-                Provo përsëri
               </Button>
             </div>
           </>
