@@ -14,6 +14,8 @@ import { toast } from '@/hooks/use-toast';
 import { Loader2, Heart } from 'lucide-react';
 import { useMyDonations } from '@/hooks/useDonations';
 import { useSEO } from '@/hooks/useSEO';
+import { MfaSetup } from '@/components/MfaSetup';
+import { MfaStatus } from '@/components/MfaStatus';
 
 export default function ProfilePage() {
   const { user, loading: authLoading } = useAuth();
