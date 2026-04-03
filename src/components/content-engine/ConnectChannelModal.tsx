@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
@@ -33,6 +33,27 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
   const [connecting, setConnecting] = useState(false);
   const [search, setSearch] = useState("");
 
+  // Listen for OAuth popup result messages
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.data?.type !== "social-oauth-result") return;
+
+      setConnecting(false);
+
+      if (event.data.status === "success") {
+        toast.success(event.data.message || "Kanali u lidh me sukses!");
+        qc.invalidateQueries({ queryKey: ["social-accounts"] });
+        resetAndClose();
+      } else {
+        toast.error(event.data.message || "Lidhja dështoi.");
+      }
+    };
+
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, [qc]);
+
   const getStatus = useCallback(
     (platform: string): ChannelStatus => {
       const accs = accounts.filter((a) => a.platform === platform && (a as any).status !== "deleted");
@@ -50,11 +71,9 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
   }, [search]);
 
   const handleSelectChannel = (ch: ChannelDefinition) => {
-    // Multi-account: always allow adding more accounts
     setSelectedChannel(ch);
     setSelectedMode(null);
 
-    // If channel has multiple modes, show comparison. Otherwise auto-select the single mode.
     if (hasMultipleModes(ch)) {
       setStep("modeCompare");
     } else {
@@ -79,6 +98,7 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
 
     try {
       await startSocialOAuth({ channel: ch, mode, popup });
+      // Don't close modal yet - wait for postMessage from popup
     } catch (err: any) {
       popup?.close();
       toast.error(err.message || "Gabim gjatë nisjes së autorizimit");
@@ -98,11 +118,14 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
 
     setConnecting(true);
     try {
+      // For credential-based channels (email, website, custom), use a sentinel token
+      // so they aren't treated as "disconnected" by cleanup logic
       const { error } = await supabase.from("social_accounts").insert({
         user_id: user.id,
         platform: selectedChannel.platform,
         account_name: accountName,
         account_id: accountId,
+        access_token: "credential-based",
         is_connected: true,
         connection_mode: selectedMode.mode,
         account_type: selectedMode.accountTypes[0] || "unknown",
@@ -174,7 +197,6 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
           </div>
         </DialogHeader>
 
-        {/* Step: Channel selection grid */}
         {step === "select" && (
           <div className="flex flex-col overflow-hidden">
             <div className="px-6 pt-4 pb-2">
@@ -213,7 +235,6 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
           </div>
         )}
 
-        {/* Step: Mode comparison */}
         {step === "modeCompare" && selectedChannel && (
           <ScrollArea style={{ maxHeight: "calc(85vh - 120px)" }}>
             <ModeComparisonStep
@@ -224,7 +245,6 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
           </ScrollArea>
         )}
 
-        {/* Step: Credentials form */}
         {step === "connect" && selectedChannel && selectedMode && (
           <ScrollArea style={{ maxHeight: "calc(85vh - 120px)" }}>
             <CredentialsStep
