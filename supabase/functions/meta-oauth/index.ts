@@ -21,7 +21,7 @@ Deno.serve(async (req) => {
       if (!META_APP_ID) throw new Error("META_APP_ID not configured");
 
       const body = await req.json();
-      const { redirectUri, platform, accountType } = body;
+      const { redirectUri, platform, accountType, connectionMode } = body;
 
       if (!redirectUri || !platform) {
         return new Response(JSON.stringify({ error: "Missing redirectUri or platform" }), {
@@ -30,7 +30,6 @@ Deno.serve(async (req) => {
         });
       }
 
-      // Scopes based on platform & account type
       let scopes: string[];
       if (platform === "instagram" && accountType === "professional") {
         scopes = [
@@ -54,7 +53,7 @@ Deno.serve(async (req) => {
         scopes = ["pages_show_list"];
       }
 
-      const state = JSON.stringify({ platform, accountType, redirectUri });
+      const state = JSON.stringify({ platform, accountType, redirectUri, connectionMode: connectionMode || "professional" });
       const stateEncoded = btoa(state);
 
       const authUrl = new URL("https://www.facebook.com/v21.0/dialog/oauth");
@@ -83,7 +82,6 @@ Deno.serve(async (req) => {
       const body = await req.json();
       const { code, redirectUri, state: stateB64 } = body;
 
-      // Get auth header to identify user
       const authHeader = req.headers.get("authorization");
       if (!authHeader) {
         return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -106,11 +104,11 @@ Deno.serve(async (req) => {
       }
 
       // Decode state
-      let stateData: { platform: string; accountType: string };
+      let stateData: { platform: string; accountType: string; connectionMode: string };
       try {
         stateData = JSON.parse(atob(stateB64));
       } catch {
-        stateData = { platform: "facebook", accountType: "professional" };
+        stateData = { platform: "facebook", accountType: "professional", connectionMode: "professional" };
       }
 
       // Exchange code for short-lived token
@@ -147,9 +145,9 @@ Deno.serve(async (req) => {
       const meRes = await fetch(`https://graph.facebook.com/v21.0/me?fields=id,name&access_token=${accessToken}`);
       const meData = await meRes.json();
 
-      // For Instagram: get connected Instagram account
       let accountName = meData.name || "";
       let accountId = meData.id || "";
+      let handleOrAddress = "";
 
       if (stateData.platform === "instagram") {
         const pagesRes = await fetch(
@@ -165,6 +163,7 @@ Deno.serve(async (req) => {
           const igData = await igRes.json();
           accountName = `@${igData.username || "instagram"}`;
           accountId = igData.id;
+          handleOrAddress = `@${igData.username || ""}`;
         } else if (stateData.accountType === "personal") {
           accountName = `${meData.name} (Personal)`;
         } else {
@@ -177,28 +176,44 @@ Deno.serve(async (req) => {
         }
       }
 
-      // Save to DB
       const tokenExpiresAt = new Date(Date.now() + expiresIn * 1000).toISOString();
+      const connMode = stateData.connectionMode || "professional";
 
-      // Check if account already exists
+      // Determine capabilities based on platform + mode
+      const capabilitiesMap: Record<string, string[]> = {
+        "instagram:professional": ["auto_post", "scheduling", "analytics", "hashtags", "media_upload", "insights"],
+        "instagram:personal": ["scheduling", "hashtags"],
+        "facebook:professional": ["auto_post", "scheduling", "analytics", "media_upload", "insights"],
+        "facebook:personal": ["scheduling"],
+      };
+      const capabilities = capabilitiesMap[`${stateData.platform}:${stateData.accountType}`] || ["scheduling"];
+
+      // Check if this exact external account already exists for this user
       const { data: existing } = await supabaseAdmin
         .from("social_accounts")
         .select("id")
         .eq("user_id", user.id)
         .eq("platform", stateData.platform)
-        .eq("account_id", accountId)
+        .eq("external_account_id", accountId)
+        .neq("status", "deleted")
         .maybeSingle();
 
       if (existing) {
-        // Update existing
+        // Update existing account
         await supabaseAdmin.from("social_accounts").update({
           access_token: accessToken,
           is_connected: true,
+          status: "connected",
           token_expires_at: tokenExpiresAt,
           account_name: accountName,
+          display_name: accountName,
+          handle_or_address: handleOrAddress,
+          connection_mode: connMode,
+          account_type: stateData.accountType,
+          capabilities,
         }).eq("id", existing.id);
       } else {
-        // Insert new
+        // Insert new account with all multi-account fields
         await supabaseAdmin.from("social_accounts").insert({
           user_id: user.id,
           platform: stateData.platform,
@@ -206,7 +221,16 @@ Deno.serve(async (req) => {
           account_id: accountId,
           access_token: accessToken,
           is_connected: true,
+          status: "connected",
           token_expires_at: tokenExpiresAt,
+          connection_mode: connMode,
+          account_type: stateData.accountType,
+          capabilities,
+          provider: stateData.platform,
+          channel_type: stateData.platform,
+          display_name: accountName,
+          external_account_id: accountId,
+          handle_or_address: handleOrAddress,
         });
       }
 

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
@@ -8,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ChevronRight, ExternalLink, Sparkles, Star, Award, Shield, CheckCircle } from 'lucide-react';
 import { useSEO } from '@/hooks/useSEO';
+import { ToolWorkspaceModal } from '@/components/ToolWorkspaceModal';
 
 const badgeConfig: Record<string, { label: string; icon: React.ReactNode }> = {
   new: { label: 'I ri', icon: <Sparkles className="h-3 w-3" /> },
@@ -21,13 +23,13 @@ export default function ToolPage() {
   const { data: tool, isLoading } = useToolBySlug(toolSlug || '');
   const { data: category } = useCategoryById(tool?.categoryId);
   const { data: subcategory } = useSubcategoryById(tool?.subcategoryId);
+  const [workspaceOpen, setWorkspaceOpen] = useState(false);
 
   useSEO({
     title: tool?.title,
     description: tool?.shortDescription,
   });
 
-  // Get real website URL from the tool data
   const websiteUrl = (tool as any)?.website_url || '';
 
   if (isLoading) {
@@ -175,19 +177,21 @@ export default function ToolPage() {
                   <div className="text-xl font-bold text-foreground">{tool.pricingText}</div>
                   <span className="text-xs text-muted-foreground capitalize">{tool.pricingType}</span>
                 </div>
-                {websiteUrl ? (
-                  <>
-                    <Button className="w-full mb-3" size="lg" asChild>
-                      <a href={websiteUrl} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="h-4 w-4 mr-2" />
-                        Vizito Faqen
-                      </a>
-                    </Button>
-                  </>
-                ) : (
-                  <p className="text-sm text-muted-foreground text-center py-2">
-                    Linku i faqes do të shtohet së shpejti.
-                  </p>
+
+                {/* Primary CTA: Internal workspace */}
+                <Button className="w-full mb-3" size="lg" onClick={() => setWorkspaceOpen(true)}>
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Përdor tani
+                </Button>
+
+                {/* Secondary: External link (optional) */}
+                {websiteUrl && (
+                  <Button variant="outline" className="w-full" size="sm" asChild>
+                    <a href={websiteUrl} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-3 w-3 mr-2" />
+                      Vizito faqen origjinale
+                    </a>
+                  </Button>
                 )}
               </div>
 
@@ -217,6 +221,20 @@ export default function ToolPage() {
           </aside>
         </div>
       </div>
+
+      {/* Internal AI Workspace Modal */}
+      <ToolWorkspaceModal
+        open={workspaceOpen}
+        onOpenChange={setWorkspaceOpen}
+        tool={{
+          title: tool.title,
+          shortDescription: tool.shortDescription,
+          provider: tool.provider,
+          modelType: tool.modelType,
+          website_url: websiteUrl,
+          tags: tool.tags,
+        }}
+      />
 
       <Footer />
     </div>
