@@ -32,11 +32,22 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
   const [connecting, setConnecting] = useState(false);
   const [search, setSearch] = useState("");
 
+  // Count connected accounts per platform for display (multi-account aware)
+  const countByPlatform = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const a of accounts) {
+      if (a.is_connected && (a as any).status !== "deleted") {
+        map[a.platform] = (map[a.platform] ?? 0) + 1;
+      }
+    }
+    return map;
+  }, [accounts]);
+
   const getStatus = useCallback(
     (platform: string): ChannelStatus => {
-      const acc = accounts.find((a) => a.platform === platform);
-      if (!acc) return "not_connected";
-      if (acc.is_connected) return "connected";
+      const accs = accounts.filter((a) => a.platform === platform && (a as any).status !== "deleted");
+      if (accs.length === 0) return "not_connected";
+      if (accs.some((a) => a.is_connected)) return "connected";
       return "reconnect_required";
     },
     [accounts],
