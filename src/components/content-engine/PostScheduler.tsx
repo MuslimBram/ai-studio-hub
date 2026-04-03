@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +39,22 @@ export function PostScheduler() {
     [accounts]
   );
 
+  const selectableAccounts = useMemo(() => {
+    if (!editingId) return connectedAccounts;
+
+    const byId = new Map<string, any>();
+    accounts
+      .filter((a: any) => a.status !== "deleted")
+      .forEach((account: any) => byId.set(account.id, account));
+
+    return Array.from(byId.values());
+  }, [accounts, connectedAccounts, editingId]);
+
+  useEffect(() => {
+    if (!open || editingId || socialAccountId || connectedAccounts.length !== 1) return;
+    handleAccountChange(connectedAccounts[0].id);
+  }, [open, editingId, socialAccountId, connectedAccounts]);
+
   // When account is selected, auto-set platform
   const handleAccountChange = (accountId: string) => {
     setSocialAccountId(accountId);
@@ -61,13 +77,24 @@ export function PostScheduler() {
       return;
     }
 
+    const selectedAccount = accounts.find((account: any) => account.id === socialAccountId);
+    if (!selectedAccount) {
+      toast.error("Llogaria sociale nuk u gjet.");
+      return;
+    }
+
+    if (!(selectedAccount.is_connected && selectedAccount.status === "connected" && selectedAccount.access_token)) {
+      toast.error("Kjo llogari nuk ka token të vlefshëm. Rilidhe përmes OAuth para publikimit.");
+      return;
+    }
+
     const scheduledAt = new Date(date);
     const [h, m] = time.split(":").map(Number);
     scheduledAt.setHours(h, m, 0, 0);
 
     const payload = {
       content,
-      platform,
+      platform: selectedAccount.platform,
       social_account_id: socialAccountId,
       scheduled_at: scheduledAt.toISOString(),
       hashtags: hashtags.split(",").map((h) => h.trim()).filter(Boolean),
@@ -92,10 +119,12 @@ export function PostScheduler() {
   };
 
   const handleEdit = (post: any) => {
+    const fallbackAccount = !post.social_account_id && connectedAccounts.length === 1 ? connectedAccounts[0] : null;
+
     setEditingId(post.id);
     setContent(post.content);
-    setPlatform(post.platform);
-    setSocialAccountId(post.social_account_id || "");
+    setPlatform(fallbackAccount?.platform || post.platform);
+    setSocialAccountId(post.social_account_id || fallbackAccount?.id || "");
     setDate(new Date(post.scheduled_at));
     setTime(format(new Date(post.scheduled_at), "HH:mm"));
     setHashtags((post.hashtags || []).join(", "));
@@ -177,9 +206,9 @@ export function PostScheduler() {
                 <Select value={socialAccountId} onValueChange={handleAccountChange}>
                   <SelectTrigger><SelectValue placeholder="Zgjidh llogarinë..." /></SelectTrigger>
                   <SelectContent>
-                    {connectedAccounts.map((a: any) => (
+                      {selectableAccounts.map((a: any) => (
                       <SelectItem key={a.id} value={a.id}>
-                        {a.display_name || a.account_name} ({a.platform})
+                          {a.display_name || a.account_name} ({a.platform}){!(a.is_connected && a.status === "connected" && a.access_token) ? " — kërkon rilidhje" : ""}
                       </SelectItem>
                     ))}
                   </SelectContent>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { ConnectChannelModal } from "./ConnectChannelModal";
 import { channels, capabilityLabels, type Capability } from "./channels-config";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { openOAuthPopup, startSocialOAuth } from "@/lib/social-oauth";
 
 interface EditFormData {
   display_name: string;
@@ -28,6 +29,26 @@ export function SocialAccountsManager() {
   const [editForm, setEditForm] = useState<EditFormData>({ display_name: "", handle_or_address: "", account_name: "" });
   const [deleteAccount, setDeleteAccount] = useState<any | null>(null);
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    const onOAuthResult = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.data?.type !== "social-oauth-result") return;
+
+      setBusy(false);
+      setModalOpen(false);
+      qc.invalidateQueries({ queryKey: ["social-accounts"] });
+
+      if (event.data.status === "success") {
+        toast.success(event.data.message);
+      } else {
+        toast.error(event.data.message);
+      }
+    };
+
+    window.addEventListener("message", onOAuthResult);
+    return () => window.removeEventListener("message", onOAuthResult);
+  }, [qc]);
 
   const handleDisconnect = async (id: string) => {
     setBusy(true);
@@ -50,10 +71,25 @@ export function SocialAccountsManager() {
   };
 
   // Reconnect must go through OAuth - not just flip a flag
-  const handleReconnect = (account: any) => {
-    // Open the connect modal so user goes through real OAuth
-    setModalOpen(true);
-    toast.info("Lidhu përsëri përmes OAuth për të rifreskuar tokenat.");
+  const handleReconnect = async (account: any) => {
+    const channel = channels.find((item) => item.platform === account.platform);
+    const mode = channel?.modes.find((item) => item.mode === account.connection_mode) ?? channel?.modes[0];
+
+    if (!channel || !mode || mode.connectionMethod !== "oauth") {
+      toast.error("Kjo llogari nuk mbështet rilidhje automatike përmes OAuth.");
+      return;
+    }
+
+    const popup = openOAuthPopup(channel.name);
+    setBusy(true);
+
+    try {
+      await startSocialOAuth({ channel, mode, popup });
+    } catch (e: any) {
+      popup?.close();
+      setBusy(false);
+      toast.error(e.message || "Gabim gjatë rilidhjes.");
+    }
   };
 
   const handleSetPrimary = async (id: string) => {
@@ -157,10 +193,12 @@ export function SocialAccountsManager() {
             const label = ch?.name || account.platform;
             const mode = account.connection_mode as string | undefined;
             const caps = (account.capabilities || []) as Capability[];
-            const isPrimary = account.is_primary;
-            const isConnected = account.is_connected;
             const hasRealToken = !!account.access_token;
-            const status = account.status || (isConnected ? "connected" : "disconnected");
+            const isPrimary = account.is_primary;
+            const isConnected = account.is_connected && hasRealToken;
+            const status = !hasRealToken && account.status === "connected"
+              ? "reconnect_required"
+              : account.status || (isConnected ? "connected" : "disconnected");
 
             const statusLabel: Record<string, string> = {
               connected: "E lidhur",
