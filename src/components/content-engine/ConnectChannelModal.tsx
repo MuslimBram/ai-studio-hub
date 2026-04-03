@@ -12,7 +12,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowLeft, Loader2, Search, HelpCircle, ExternalLink } from "lucide-react";
+import { ArrowLeft, Search, HelpCircle } from "lucide-react";
+import { openOAuthPopup, startSocialOAuth } from "@/lib/social-oauth";
 
 interface ConnectChannelModalProps {
   open: boolean;
@@ -32,22 +33,11 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
   const [connecting, setConnecting] = useState(false);
   const [search, setSearch] = useState("");
 
-  // Count connected accounts per platform for display (multi-account aware)
-  const countByPlatform = useMemo(() => {
-    const map: Record<string, number> = {};
-    for (const a of accounts) {
-      if (a.is_connected && (a as any).status !== "deleted") {
-        map[a.platform] = (map[a.platform] ?? 0) + 1;
-      }
-    }
-    return map;
-  }, [accounts]);
-
   const getStatus = useCallback(
     (platform: string): ChannelStatus => {
       const accs = accounts.filter((a) => a.platform === platform && (a as any).status !== "deleted");
       if (accs.length === 0) return "not_connected";
-      if (accs.some((a) => a.is_connected)) return "connected";
+      if (accs.some((a) => a.is_connected && !!a.access_token)) return "connected";
       return "reconnect_required";
     },
     [accounts],
@@ -77,7 +67,7 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
     setSelectedMode(mode);
 
     if (mode.connectionMethod === "oauth") {
-      initiateOAuth(ch, mode);
+      void initiateOAuth(ch, mode);
     } else {
       setStep("connect");
     }
@@ -85,38 +75,12 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
 
   const initiateOAuth = async (ch: ChannelDefinition, mode: ModeDefinition) => {
     setConnecting(true);
+    const popup = openOAuthPopup(ch.name);
+
     try {
-      const redirectUri = `${window.location.origin}/oauth/callback`;
-
-      // Determine which edge function to call
-      let functionName = "meta-oauth";
-      let bodyPayload: Record<string, string> = {
-        redirectUri,
-        platform: ch.platform,
-        accountType: mode.accountTypes[0] || "professional",
-        connectionMode: mode.mode,
-      };
-
-      if (ch.platform === "linkedin") {
-        functionName = "linkedin-oauth";
-        bodyPayload = { redirectUri, connectionMode: mode.mode };
-      }
-
-      const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${functionName}?action=authorize`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-          },
-          body: JSON.stringify(bodyPayload),
-        },
-      );
-      const data = await res.json();
-      if (!res.ok || data.error) throw new Error(data.error || "Gabim");
-      window.location.href = data.authUrl;
+      await startSocialOAuth({ channel: ch, mode, popup });
     } catch (err: any) {
+      popup?.close();
       toast.error(err.message || "Gabim gjatë nisjes së autorizimit");
       setConnecting(false);
     }

@@ -72,9 +72,28 @@ export default function OAuthCallbackPage() {
       setAccountName(result.accountName || "");
       setStatus("success");
       setMessage(`${result.platform || "Kanali"} u lidh me sukses!`);
+
+      if (window.opener && !window.opener.closed) {
+        window.opener.postMessage({
+          type: "social-oauth-result",
+          status: "success",
+          platform: result.platform,
+          accountName: result.accountName || "",
+          message: `${result.platform || "Kanali"} u lidh me sukses!`,
+        }, window.location.origin);
+        window.close();
+      }
     } catch (err: any) {
       setStatus("error");
       setMessage(err.message || "Gabim gjatë lidhjes së kanalit.");
+
+      if (window.opener && !window.opener.closed) {
+        window.opener.postMessage({
+          type: "social-oauth-result",
+          status: "error",
+          message: err.message || "Gabim gjatë lidhjes së kanalit.",
+        }, window.location.origin);
+      }
     }
   };
 
