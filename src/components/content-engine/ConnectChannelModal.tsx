@@ -32,11 +32,22 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
   const [connecting, setConnecting] = useState(false);
   const [search, setSearch] = useState("");
 
+  // Count connected accounts per platform for display (multi-account aware)
+  const countByPlatform = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const a of accounts) {
+      if (a.is_connected && (a as any).status !== "deleted") {
+        map[a.platform] = (map[a.platform] ?? 0) + 1;
+      }
+    }
+    return map;
+  }, [accounts]);
+
   const getStatus = useCallback(
     (platform: string): ChannelStatus => {
-      const acc = accounts.find((a) => a.platform === platform);
-      if (!acc) return "not_connected";
-      if (acc.is_connected) return "connected";
+      const accs = accounts.filter((a) => a.platform === platform && (a as any).status !== "deleted");
+      if (accs.length === 0) return "not_connected";
+      if (accs.some((a) => a.is_connected)) return "connected";
       return "reconnect_required";
     },
     [accounts],
@@ -49,11 +60,7 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
   }, [search]);
 
   const handleSelectChannel = (ch: ChannelDefinition) => {
-    const status = getStatus(ch.platform);
-    if (status === "connected") {
-      toast.info(`${ch.name} është tashmë e lidhur.`);
-      return;
-    }
+    // Multi-account: always allow adding more accounts
     setSelectedChannel(ch);
     setSelectedMode(null);
 
@@ -126,6 +133,12 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
         connection_mode: selectedMode.mode,
         account_type: selectedMode.accountTypes[0] || "unknown",
         capabilities: selectedMode.capabilities,
+        provider: selectedChannel.platform,
+        channel_type: selectedChannel.platform,
+        display_name: accountName,
+        external_account_id: accountId,
+        handle_or_address: accountId,
+        status: "connected",
       });
       if (error) throw error;
       qc.invalidateQueries({ queryKey: ["social-accounts"] });

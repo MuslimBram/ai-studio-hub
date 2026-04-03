@@ -28,11 +28,31 @@ serve(async (req) => {
 
     const { action_type, category } = await req.json();
 
-    // Get user's plan via service role
     const adminClient = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
+
+    // Check if user is admin — admins bypass all limits
+    const { data: isAdmin } = await adminClient.rpc("is_admin_user", { _user_id: user.id });
+
+    if (isAdmin) {
+      // Log usage but don't enforce limits
+      await adminClient.from("ai_usage_logs").insert({
+        user_id: user.id,
+        category: category || "general",
+        action_type: action_type || "reply",
+        tokens_used: 0,
+      });
+
+      return new Response(JSON.stringify({
+        allowed: true,
+        used: 0,
+        limit: -1,
+        remaining: -1,
+        admin_bypass: true,
+      }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
 
     // Get subscription
     const { data: sub } = await adminClient
@@ -42,7 +62,6 @@ serve(async (req) => {
       .eq("status", "active")
       .maybeSingle();
 
-    // Default to free plan
     let plan = sub?.plan;
     if (!plan) {
       const { data: freePlan } = await adminClient.from("plans").select("*").eq("id", "plan-free").single();
@@ -61,7 +80,7 @@ serve(async (req) => {
     if (!plan.ai_features_enabled.includes(requiredFeature)) {
       return new Response(JSON.stringify({
         allowed: false,
-        reason: `Feature "${category}" not available on ${plan.name} plan`,
+        reason: `Funksioni "${category}" nuk është i disponueshëm në planin ${plan.name}`,
       }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
@@ -74,7 +93,6 @@ serve(async (req) => {
     };
     const limit = limitMap[action_type || "reply"] ?? 0;
 
-    // Count today's usage
     const todayStart = new Date();
     todayStart.setUTCHours(0, 0, 0, 0);
 
@@ -89,7 +107,7 @@ serve(async (req) => {
     if (used >= limit) {
       return new Response(JSON.stringify({
         allowed: false,
-        reason: `Daily limit reached: ${used}/${limit}`,
+        reason: `Limiti ditor u arrit: ${used}/${limit}`,
         used,
         limit,
       }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
