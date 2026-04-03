@@ -133,6 +133,12 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
         connection_mode: selectedMode.mode,
         account_type: selectedMode.accountTypes[0] || "unknown",
         capabilities: selectedMode.capabilities,
+        provider: selectedChannel.platform,
+        channel_type: selectedChannel.platform,
+        display_name: accountName,
+        external_account_id: accountId,
+        handle_or_address: accountId,
+        status: "connected",
       });
       if (error) throw error;
       qc.invalidateQueries({ queryKey: ["social-accounts"] });
