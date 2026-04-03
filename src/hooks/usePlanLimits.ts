@@ -1,5 +1,6 @@
 import { useMemo, useCallback } from "react";
 import { useUserSubscription, useAiUsageToday, type Plan } from "./useSubscription";
+import { useIsAdmin } from "./useAdmin";
 
 export type AiCategory = "inbox" | "content" | "media" | "strategy" | "automation" | "general";
 export type AiActionType = "reply" | "text_generation" | "image_generation" | "video_generation";
@@ -26,6 +27,7 @@ function getLimitForAction(plan: Plan, actionType: AiActionType): number {
 export function usePlanLimits() {
   const { currentPlan, isFreePlan } = useUserSubscription();
   const { data: usageToday = [] } = useAiUsageToday();
+  const { data: isAdmin = false } = useIsAdmin();
 
   const usageByAction = useMemo(() => {
     const map: Record<string, number> = {};
@@ -44,17 +46,20 @@ export function usePlanLimits() {
   }, [usageToday]);
 
   const getUsage = useCallback((actionType: AiActionType) => {
+    if (isAdmin) return { used: 0, limit: -1, remaining: -1, isAtLimit: false };
     const used = usageByAction[actionType] ?? 0;
     const limit = getLimitForAction(currentPlan, actionType);
     return { used, limit, remaining: Math.max(0, limit - used), isAtLimit: used >= limit };
-  }, [usageByAction, currentPlan]);
+  }, [usageByAction, currentPlan, isAdmin]);
 
   const canUseAiFeature = useCallback((category: AiCategory): boolean => {
+    if (isAdmin) return true;
     const featureKey = AI_FEATURE_MAP[category] ?? "basic_reply";
     return currentPlan.ai_features_enabled.includes(featureKey);
-  }, [currentPlan]);
+  }, [currentPlan, isAdmin]);
 
   const canPerformAction = useCallback((actionType: AiActionType, category: AiCategory = "general"): { allowed: boolean; reason?: string } => {
+    if (isAdmin) return { allowed: true };
     if (!canUseAiFeature(category)) {
       return { allowed: false, reason: `Funksioni "${category}" nuk është i disponueshëm në planin tuaj ${currentPlan.name}. Përmirësoni planin.` };
     }
@@ -63,21 +68,23 @@ export function usePlanLimits() {
       return { allowed: false, reason: `Keni arritur limitin ditor: ${used}/${limit} ${actionType}. Provoni përsëri nesër ose përmirësoni planin.` };
     }
     return { allowed: true };
-  }, [canUseAiFeature, getUsage, currentPlan]);
+  }, [canUseAiFeature, getUsage, currentPlan, isAdmin]);
 
   const hasFeature = useCallback((feature: string): boolean => {
+    if (isAdmin) return true;
     return currentPlan.features_enabled.includes(feature);
-  }, [currentPlan]);
+  }, [currentPlan, isAdmin]);
 
   return {
     currentPlan,
-    isFreePlan,
+    isFreePlan: isAdmin ? false : isFreePlan,
+    isAdmin,
     getUsage,
     canUseAiFeature,
     canPerformAction,
     hasFeature,
     usageByAction,
     usageByCategory,
-    channelLimit: currentPlan.max_channels,
+    channelLimit: isAdmin ? -1 : currentPlan.max_channels,
   };
 }
