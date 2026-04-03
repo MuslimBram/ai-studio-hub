@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import { useSEO } from '@/hooks/useSEO';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Loader2 } from 'lucide-react';
 
 export default function SignupPage() {
@@ -16,17 +17,18 @@ export default function SignupPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const { t } = useLanguage();
 
-  useSEO({ title: 'Regjistrohu', description: 'Krijoni llogarinë tuaj falas në AI Tools Hub.' });
+  useSEO({ title: t('signup_title'), description: t('signup_title') });
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
-      toast({ title: 'Gabim', description: 'Plotësoni email dhe fjalëkalimin.', variant: 'destructive' });
+      toast({ title: t('error_title'), description: t('error_fill_email_password'), variant: 'destructive' });
       return;
     }
     if (password.length < 6) {
-      toast({ title: 'Gabim', description: 'Fjalëkalimi duhet të ketë të paktën 6 karaktere.', variant: 'destructive' });
+      toast({ title: t('error_title'), description: t('signup_password_min'), variant: 'destructive' });
       return;
     }
     setLoading(true);
@@ -40,7 +42,7 @@ export default function SignupPage() {
     });
     setLoading(false);
     if (error) {
-      toast({ title: 'Gabim', description: error.message, variant: 'destructive' });
+      toast({ title: t('error_title'), description: error.message, variant: 'destructive' });
     } else {
       setSent(true);
     }
@@ -52,11 +54,11 @@ export default function SignupPage() {
         <Navbar />
         <div className="container flex items-center justify-center py-20 flex-1">
           <div className="w-full max-w-md rounded-xl border bg-card p-8 shadow-card text-center">
-            <h1 className="mb-4 text-2xl font-bold text-foreground">Verifikoni Email-in</h1>
+            <h1 className="mb-4 text-2xl font-bold text-foreground">{t('signup_verify_title')}</h1>
             <p className="text-muted-foreground">
-              Kemi dërguar një link verifikimi te <strong className="text-foreground">{email}</strong>. Kontrolloni inbox-in tuaj për të aktivizuar llogarinë.
+              {t('signup_verify_text')} <strong className="text-foreground">{email}</strong>.
             </p>
-            <Link to="/login" className="mt-6 inline-block text-primary hover:underline">Kthehu te kyçja</Link>
+            <Link to="/login" className="mt-6 inline-block text-primary hover:underline">{t('signup_verify_back')}</Link>
           </div>
         </div>
         <Footer />
@@ -69,28 +71,28 @@ export default function SignupPage() {
       <Navbar />
       <div className="container flex items-center justify-center py-20 flex-1">
         <div className="w-full max-w-md rounded-xl border bg-card p-8 shadow-card">
-          <h1 className="mb-6 text-2xl font-bold text-foreground text-center">Regjistrohu</h1>
+          <h1 className="mb-6 text-2xl font-bold text-foreground text-center">{t('signup_title')}</h1>
           <form onSubmit={handleSignup} className="space-y-4">
             <div>
-              <Label htmlFor="name">Emri</Label>
-              <Input id="name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Emri juaj" />
+              <Label htmlFor="name">{t('signup_name')}</Label>
+              <Input id="name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder={t('signup_name_placeholder')} />
             </div>
             <div>
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@shembull.com" />
+              <Label htmlFor="email">{t('login_email')}</Label>
+              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t('email_placeholder')} />
             </div>
             <div>
-              <Label htmlFor="password">Fjalëkalimi</Label>
+              <Label htmlFor="password">{t('login_password')}</Label>
               <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Minimum 6 karaktere" />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
               {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              Regjistrohu
+              {t('signup_button')}
             </Button>
           </form>
           <p className="mt-4 text-center text-sm text-muted-foreground">
-            Keni llogari?{' '}
-            <Link to="/login" className="text-primary hover:underline">Kyçu</Link>
+            {t('signup_has_account')}{' '}
+            <Link to="/login" className="text-primary hover:underline">{t('nav_login')}</Link>
           </p>
         </div>
       </div>

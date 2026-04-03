@@ -9,14 +9,16 @@ import { CompetitorAnalysis } from "@/components/content-engine/CompetitorAnalys
 import { PerformanceAnalytics } from "@/components/content-engine/PerformanceAnalytics";
 import { SocialAccountsManager } from "@/components/content-engine/SocialAccountsManager";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Navigate } from "react-router-dom";
 import { useSEO } from "@/hooks/useSEO";
 
 export default function ContentEnginePage() {
   const { user, loading } = useAuth();
   const [activeTab, setActiveTab] = useState("dashboard");
+  const { t } = useLanguage();
 
-  useSEO({ title: "Content & Growth Engine - Pulse AI", description: "Menaxho rrjetet sociale, gjenero përmbajtje AI dhe analizo konkurencën." });
+  useSEO({ title: t('ce_title'), description: t('ce_subtitle') });
 
   if (!loading && !user) return <Navigate to="/login" />;
 
@@ -25,18 +27,18 @@ export default function ContentEnginePage() {
       <Navbar />
       <main className="flex-1 container py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground">Content & Growth Engine</h1>
-          <p className="text-muted-foreground mt-1">Menaxho, gjenero dhe publiko përmbajtje në të gjitha kanalet.</p>
+          <h1 className="text-3xl font-bold text-foreground">{t('ce_title')}</h1>
+          <p className="text-muted-foreground mt-1">{t('ce_subtitle')}</p>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-6 lg:w-auto lg:inline-grid">
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="scheduler">Scheduler</TabsTrigger>
-            <TabsTrigger value="generator">AI Content</TabsTrigger>
-            <TabsTrigger value="competitors">Konkurenca</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="channels">Kanalet</TabsTrigger>
+            <TabsTrigger value="dashboard">{t('ce_dashboard')}</TabsTrigger>
+            <TabsTrigger value="scheduler">{t('ce_scheduler')}</TabsTrigger>
+            <TabsTrigger value="generator">{t('ce_ai_content')}</TabsTrigger>
+            <TabsTrigger value="competitors">{t('ce_competitors')}</TabsTrigger>
+            <TabsTrigger value="analytics">{t('ce_analytics')}</TabsTrigger>
+            <TabsTrigger value="channels">{t('ce_channels')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard"><ContentDashboard /></TabsContent>
