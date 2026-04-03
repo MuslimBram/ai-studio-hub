@@ -6,6 +6,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useGenerateContent, useSaveContentSuggestion } from "@/hooks/useContentEngine";
+import { useAiAction } from "@/hooks/useAiAction";
+import { usePlanLimits } from "@/hooks/usePlanLimits";
+import { PlanUpgradePrompt } from "@/components/PlanUpgradePrompt";
+import { AiUsageMeter } from "@/components/AiUsageMeter";
 import { Sparkles, Copy, CalendarPlus, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -19,8 +23,34 @@ export function ContentGenerator() {
 
   const generate = useGenerateContent();
   const saveSuggestion = useSaveContentSuggestion();
+  const aiAction = useAiAction();
+  const { canPerformAction, isAdmin } = usePlanLimits();
 
   const handleGenerate = async () => {
+    // Check AI limits before generating (backend enforcement)
+    if (!isAdmin) {
+      const check = canPerformAction("text_generation", "content");
+      if (!check.allowed) {
+        toast.error(check.reason);
+        return;
+      }
+
+      // Backend enforcement: call check-ai-usage which also logs usage
+      try {
+        const usageResult = await aiAction.mutateAsync({
+          actionType: "text_generation",
+          category: "content",
+        });
+        if (!usageResult.allowed) {
+          toast.error(usageResult.reason || "Limiti i AI u arrit.");
+          return;
+        }
+      } catch (e: any) {
+        toast.error("Gabim në kontrollin e limitit AI");
+        return;
+      }
+    }
+
     try {
       const res = await generate.mutateAsync({
         type,
@@ -55,6 +85,8 @@ export function ContentGenerator() {
       toast.error(e.message || "Gabim");
     }
   };
+
+  const isPending = generate.isPending || aiAction.isPending;
 
   return (
     <div className="space-y-6">
@@ -101,9 +133,12 @@ export function ContentGenerator() {
 
           <Textarea placeholder="Përshkrimi i biznesit (opsionale)" value={businessDesc} onChange={(e) => setBusinessDesc(e.target.value)} rows={3} />
 
-          <Button onClick={handleGenerate} disabled={generate.isPending} className="w-full">
-            {generate.isPending ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Duke gjeneruar...</> : <><Sparkles className="h-4 w-4 mr-2" /> Gjenero</>}
+          <Button onClick={handleGenerate} disabled={isPending} className="w-full">
+            {isPending ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Duke gjeneruar...</> : <><Sparkles className="h-4 w-4 mr-2" /> Gjenero</>}
           </Button>
+
+          {/* AI Usage Meter */}
+          <AiUsageMeter compact />
         </CardContent>
       </Card>
 
