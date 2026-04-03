@@ -544,6 +544,296 @@ export type Database = {
         }
         Relationships: []
       }
+      social_analytics_snapshots: {
+        Row: {
+          clicks: number
+          comments: number
+          created_at: string
+          engagement: number
+          engagement_rate: number
+          followers: number
+          following: number
+          id: string
+          impressions: number
+          likes: number
+          platform: string
+          profile_views: number
+          reach: number
+          shares: number
+          snapshot_date: string
+          social_account_id: string
+          total_posts: number
+          user_id: string
+        }
+        Insert: {
+          clicks?: number
+          comments?: number
+          created_at?: string
+          engagement?: number
+          engagement_rate?: number
+          followers?: number
+          following?: number
+          id?: string
+          impressions?: number
+          likes?: number
+          platform?: string
+          profile_views?: number
+          reach?: number
+          shares?: number
+          snapshot_date?: string
+          social_account_id: string
+          total_posts?: number
+          user_id: string
+        }
+        Update: {
+          clicks?: number
+          comments?: number
+          created_at?: string
+          engagement?: number
+          engagement_rate?: number
+          followers?: number
+          following?: number
+          id?: string
+          impressions?: number
+          likes?: number
+          platform?: string
+          profile_views?: number
+          reach?: number
+          shares?: number
+          snapshot_date?: string
+          social_account_id?: string
+          total_posts?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_analytics_snapshots_social_account_id_fkey"
+            columns: ["social_account_id"]
+            isOneToOne: false
+            referencedRelation: "social_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_insights: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          insight_type: string
+          is_read: boolean
+          metadata_json: Json
+          platform: string
+          priority: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          id?: string
+          insight_type?: string
+          is_read?: boolean
+          metadata_json?: Json
+          platform?: string
+          priority?: string
+          title?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          insight_type?: string
+          is_read?: boolean
+          metadata_json?: Json
+          platform?: string
+          priority?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      social_post_metrics: {
+        Row: {
+          clicks: number
+          comments: number
+          content_preview: string
+          created_at: string
+          engagement_rate: number
+          external_post_id: string
+          id: string
+          impressions: number
+          likes: number
+          platform: string
+          post_type: string
+          published_at: string
+          published_post_id: string | null
+          reach: number
+          saves: number
+          shares: number
+          social_account_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          clicks?: number
+          comments?: number
+          content_preview?: string
+          created_at?: string
+          engagement_rate?: number
+          external_post_id?: string
+          id?: string
+          impressions?: number
+          likes?: number
+          platform?: string
+          post_type?: string
+          published_at?: string
+          published_post_id?: string | null
+          reach?: number
+          saves?: number
+          shares?: number
+          social_account_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          clicks?: number
+          comments?: number
+          content_preview?: string
+          created_at?: string
+          engagement_rate?: number
+          external_post_id?: string
+          id?: string
+          impressions?: number
+          likes?: number
+          platform?: string
+          post_type?: string
+          published_at?: string
+          published_post_id?: string | null
+          reach?: number
+          saves?: number
+          shares?: number
+          social_account_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_post_metrics_published_post_id_fkey"
+            columns: ["published_post_id"]
+            isOneToOne: false
+            referencedRelation: "published_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "social_post_metrics_social_account_id_fkey"
+            columns: ["social_account_id"]
+            isOneToOne: false
+            referencedRelation: "social_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_post_tags: {
+        Row: {
+          created_at: string
+          id: string
+          post_metric_id: string
+          tag_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_metric_id: string
+          tag_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_metric_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_post_tags_post_metric_id_fkey"
+            columns: ["post_metric_id"]
+            isOneToOne: false
+            referencedRelation: "social_post_metrics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "social_post_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "social_tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_reports: {
+        Row: {
+          created_at: string
+          date_from: string
+          date_to: string
+          generated_at: string
+          id: string
+          platform_filter: string
+          report_type: string
+          summary_json: Json
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date_from?: string
+          date_to?: string
+          generated_at?: string
+          id?: string
+          platform_filter?: string
+          report_type?: string
+          summary_json?: Json
+          title?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date_from?: string
+          date_to?: string
+          generated_at?: string
+          id?: string
+          platform_filter?: string
+          report_type?: string
+          summary_json?: Json
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      social_tags: {
+        Row: {
+          color: string
+          created_at: string
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       subcategories: {
         Row: {
           category_id: string

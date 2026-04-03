@@ -87,20 +87,30 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
     setConnecting(true);
     try {
       const redirectUri = `${window.location.origin}/oauth/callback`;
+
+      // Determine which edge function to call
+      let functionName = "meta-oauth";
+      let bodyPayload: Record<string, string> = {
+        redirectUri,
+        platform: ch.platform,
+        accountType: mode.accountTypes[0] || "professional",
+        connectionMode: mode.mode,
+      };
+
+      if (ch.platform === "linkedin") {
+        functionName = "linkedin-oauth";
+        bodyPayload = { redirectUri, connectionMode: mode.mode };
+      }
+
       const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/meta-oauth?action=authorize`,
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${functionName}?action=authorize`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
           },
-          body: JSON.stringify({
-            redirectUri,
-            platform: ch.platform,
-            accountType: mode.accountTypes[0] || "professional",
-            connectionMode: mode.mode,
-          }),
+          body: JSON.stringify(bodyPayload),
         },
       );
       const data = await res.json();

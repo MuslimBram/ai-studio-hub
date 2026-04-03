@@ -43,7 +43,15 @@ export default function OAuthCallbackPage() {
         throw new Error("Nuk je i kyçur. Kyçu dhe provo përsëri.");
       }
 
-      const fnUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/meta-oauth?action=callback`;
+      // Determine which function to call based on state
+      let platform = "facebook";
+      try {
+        const stateData = JSON.parse(atob(stateB64));
+        platform = stateData.platform || "facebook";
+      } catch {}
+
+      const functionName = platform === "linkedin" ? "linkedin-oauth" : "meta-oauth";
+      const fnUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${functionName}?action=callback`;
 
       const res = await fetch(fnUrl, {
         method: "POST",
