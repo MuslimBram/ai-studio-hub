@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { useSocialAccounts } from "@/hooks/useContentEngine";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { Link2, Unlink, Plus, RefreshCw, Trash2, Star, Pencil, MoreVertical } from "lucide-react";
+import { Link2, Unlink, Plus, Trash2, Star, Pencil, MoreVertical, ShieldAlert, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { ConnectChannelModal } from "./ConnectChannelModal";
 import { channels, capabilityLabels, type Capability } from "./channels-config";
@@ -32,7 +32,13 @@ export function SocialAccountsManager() {
   const handleDisconnect = async (id: string) => {
     setBusy(true);
     try {
-      const { error } = await supabase.from("social_accounts").update({ is_connected: false, status: "disconnected" }).eq("id", id);
+      const { error } = await supabase.from("social_accounts").update({
+        is_connected: false,
+        status: "disconnected",
+        access_token: "",
+        refresh_token: "",
+        token_expires_at: null,
+      }).eq("id", id);
       if (error) throw error;
       qc.invalidateQueries({ queryKey: ["social-accounts"] });
       toast.success("Llogaria u shkëput!");
@@ -43,18 +49,11 @@ export function SocialAccountsManager() {
     }
   };
 
-  const handleReconnect = async (id: string) => {
-    setBusy(true);
-    try {
-      const { error } = await supabase.from("social_accounts").update({ is_connected: true, status: "connected" }).eq("id", id);
-      if (error) throw error;
-      qc.invalidateQueries({ queryKey: ["social-accounts"] });
-      toast.success("Llogaria u rilidhë!");
-    } catch (e: any) {
-      toast.error(e.message || "Gabim");
-    } finally {
-      setBusy(false);
-    }
+  // Reconnect must go through OAuth - not just flip a flag
+  const handleReconnect = (account: any) => {
+    // Open the connect modal so user goes through real OAuth
+    setModalOpen(true);
+    toast.info("Lidhu përsëri përmes OAuth për të rifreskuar tokenat.");
   };
 
   const handleSetPrimary = async (id: string) => {
@@ -75,7 +74,14 @@ export function SocialAccountsManager() {
     if (!deleteAccount) return;
     setBusy(true);
     try {
-      const { error } = await supabase.from("social_accounts").update({ status: "deleted", is_connected: false, is_primary: false }).eq("id", deleteAccount.id);
+      const { error } = await supabase.from("social_accounts").update({
+        status: "deleted",
+        is_connected: false,
+        is_primary: false,
+        access_token: "",
+        refresh_token: "",
+        token_expires_at: null,
+      }).eq("id", deleteAccount.id);
       if (error) throw error;
       qc.invalidateQueries({ queryKey: ["social-accounts"] });
       toast.success("Llogaria u fshi!");
@@ -125,7 +131,7 @@ export function SocialAccountsManager() {
         <div>
           <h2 className="text-xl font-semibold text-foreground">Kanalet e lidhura</h2>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Menaxho llogaritë e rrjeteve sociale. Mund të lidhësh shumë llogari për të njëjtin kanal.
+            Menaxho llogaritë e rrjeteve sociale. Lidhu përmes OAuth për token të vlefshëm.
           </p>
         </div>
         <Button onClick={() => setModalOpen(true)}>
@@ -153,6 +159,7 @@ export function SocialAccountsManager() {
             const caps = (account.capabilities || []) as Capability[];
             const isPrimary = account.is_primary;
             const isConnected = account.is_connected;
+            const hasRealToken = !!account.access_token;
             const status = account.status || (isConnected ? "connected" : "disconnected");
 
             const statusLabel: Record<string, string> = {
@@ -163,7 +170,7 @@ export function SocialAccountsManager() {
               pending: "Në pritje",
             };
 
-            const statusVariant = isConnected ? "default" as const : "secondary" as const;
+            const statusVariant = isConnected && hasRealToken ? "default" as const : "secondary" as const;
 
             return (
               <Card key={account.id} className={isPrimary ? "ring-2 ring-primary/50" : ""}>
@@ -183,6 +190,12 @@ export function SocialAccountsManager() {
                         <Badge variant={statusVariant} className="text-[10px]">
                           {statusLabel[status] || status}
                         </Badge>
+                        {/* Token status indicator */}
+                        {isConnected && hasRealToken ? (
+                          <CheckCircle2 className="h-3 w-3 text-emerald-500" />
+                        ) : isConnected && !hasRealToken ? (
+                          <ShieldAlert className="h-3 w-3 text-amber-500" title="Pa token" />
+                        ) : null}
                         <span className="text-xs text-muted-foreground">{label}</span>
                       </div>
                       {account.handle_or_address && (
@@ -207,9 +220,9 @@ export function SocialAccountsManager() {
                             Shkëput
                           </DropdownMenuItem>
                         ) : (
-                          <DropdownMenuItem onClick={() => handleReconnect(account.id)} disabled={busy}>
-                            <RefreshCw className="h-4 w-4 mr-2" />
-                            Rilidh
+                          <DropdownMenuItem onClick={() => handleReconnect(account)} disabled={busy}>
+                            <Link2 className="h-4 w-4 mr-2" />
+                            Rilidh përmes OAuth
                           </DropdownMenuItem>
                         )}
                         {!isPrimary && isConnected && (
@@ -226,6 +239,13 @@ export function SocialAccountsManager() {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
+
+                  {/* Token warning */}
+                  {isConnected && !hasRealToken && (
+                    <div className="text-xs text-amber-600 bg-amber-500/10 rounded px-2 py-1">
+                      ⚠ Pa token — rilidhu përmes OAuth
+                    </div>
+                  )}
 
                   {/* Mode & capabilities */}
                   <div className="flex flex-wrap gap-1.5">
