@@ -194,7 +194,7 @@ export function SocialAccountsManager() {
                         {isConnected && hasRealToken ? (
                           <CheckCircle2 className="h-3 w-3 text-emerald-500" />
                         ) : isConnected && !hasRealToken ? (
-                          <ShieldAlert className="h-3 w-3 text-amber-500" title="Pa token" />
+                          <ShieldAlert className="h-3 w-3 text-amber-500" />
                         ) : null}
                         <span className="text-xs text-muted-foreground">{label}</span>
                       </div>
