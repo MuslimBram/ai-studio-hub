@@ -6,7 +6,7 @@ import { ContentDashboard } from "@/components/content-engine/ContentDashboard";
 import { PostScheduler } from "@/components/content-engine/PostScheduler";
 import { ContentGenerator } from "@/components/content-engine/ContentGenerator";
 import { CompetitorAnalysis } from "@/components/content-engine/CompetitorAnalysis";
-import { PerformanceAnalytics } from "@/components/content-engine/PerformanceAnalytics";
+import { AnalyticsDashboard } from "@/components/content-engine/AnalyticsDashboard";
 import { SocialAccountsManager } from "@/components/content-engine/SocialAccountsManager";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -45,7 +45,7 @@ export default function ContentEnginePage() {
           <TabsContent value="scheduler"><PostScheduler /></TabsContent>
           <TabsContent value="generator"><ContentGenerator /></TabsContent>
           <TabsContent value="competitors"><CompetitorAnalysis /></TabsContent>
-          <TabsContent value="analytics"><PerformanceAnalytics /></TabsContent>
+          <TabsContent value="analytics"><AnalyticsDashboard /></TabsContent>
           <TabsContent value="channels"><SocialAccountsManager /></TabsContent>
         </Tabs>
       </main>
