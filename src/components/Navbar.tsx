@@ -3,7 +3,9 @@ import { Link, useLocation } from 'react-router-dom';
 import { Zap, Menu, X, User, LogOut, Heart, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsAdmin } from '@/hooks/useAdmin';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,22 +13,23 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-const navLinks = [
-  { to: '/', label: 'Kryefaqja' },
-  { to: '/tools/image', label: 'Foto' },
-  { to: '/tools/video', label: 'Video' },
-  { to: '/tools/audio', label: 'Audio' },
-  { to: '/tools/text', label: 'Tekst' },
-  { to: '/tools/games', label: 'Lojra' },
-  { to: '/tools/business', label: 'Biznes' },
-  { to: '/content-engine', label: 'Content Engine' },
-];
-
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const { user, loading, signOut } = useAuth();
   const { data: isAdmin } = useIsAdmin();
+  const { t } = useLanguage();
+
+  const navLinks = [
+    { to: '/', label: t('nav_home') },
+    { to: '/tools/image', label: t('nav_photo') },
+    { to: '/tools/video', label: t('nav_video') },
+    { to: '/tools/audio', label: t('nav_audio') },
+    { to: '/tools/text', label: t('nav_text') },
+    { to: '/tools/games', label: t('nav_games') },
+    { to: '/tools/business', label: t('nav_business') },
+    { to: '/content-engine', label: t('nav_content_engine') },
+  ];
 
   return (
     <header className="sticky top-0 z-50 border-b bg-card/80 backdrop-blur-lg">
@@ -35,10 +38,9 @@ export function Navbar() {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg gradient-hero">
             <Zap className="h-4 w-4 text-primary-foreground" />
           </div>
-          <span className="text-lg font-bold text-foreground">AI Tools Hub</span>
+          <span className="text-lg font-bold text-foreground">Pulse AI</span>
         </Link>
 
-        {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-1">
           {navLinks.map((link) => {
             const isActive = link.to === '/'
@@ -60,10 +62,10 @@ export function Navbar() {
           })}
         </nav>
 
-        {/* Auth area */}
         <div className="hidden md:flex items-center gap-2">
+          <LanguageSwitcher />
           <Button variant="ghost" size="sm" asChild className="text-destructive hover:text-destructive">
-            <Link to="/donate"><Heart className="h-4 w-4 mr-1" />Dhuro</Link>
+            <Link to="/donate"><Heart className="h-4 w-4 mr-1" />{t('nav_donate')}</Link>
           </Button>
           {!loading && (
             user ? (
@@ -77,37 +79,36 @@ export function Navbar() {
                   <DropdownMenuItem asChild>
                     <Link to="/profile" className="flex items-center gap-2">
                       <User className="h-4 w-4" />
-                      Profili
+                      {t('nav_profile')}
                     </Link>
                   </DropdownMenuItem>
                   {isAdmin && (
                     <DropdownMenuItem asChild>
                       <Link to="/admin" className="flex items-center gap-2">
                         <Shield className="h-4 w-4" />
-                        Admin Panel
+                        {t('nav_admin')}
                       </Link>
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuItem onClick={signOut} className="flex items-center gap-2">
                     <LogOut className="h-4 w-4" />
-                    Dilni
+                    {t('nav_logout')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
               <>
                 <Button variant="ghost" size="sm" asChild>
-                  <Link to="/login">Kyçu</Link>
+                  <Link to="/login">{t('nav_login')}</Link>
                 </Button>
                 <Button size="sm" asChild>
-                  <Link to="/signup">Regjistrohu</Link>
+                  <Link to="/signup">{t('nav_signup')}</Link>
                 </Button>
               </>
             )
           )}
         </div>
 
-        {/* Mobile toggle */}
         <Button
           variant="ghost"
           size="icon"
@@ -119,7 +120,6 @@ export function Navbar() {
         </Button>
       </div>
 
-      {/* Mobile menu */}
       {mobileOpen && (
         <div className="md:hidden border-t bg-card">
           <nav className="container flex flex-col gap-1 py-4">
@@ -143,26 +143,29 @@ export function Navbar() {
               );
             })}
             <Link to="/donate" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-destructive font-medium flex items-center gap-2">
-              <Heart className="h-4 w-4" /> Dhuro
+              <Heart className="h-4 w-4" /> {t('nav_donate')}
             </Link>
+            <div className="px-4 py-2">
+              <LanguageSwitcher />
+            </div>
             <div className="mt-2 border-t pt-3 flex flex-col gap-1">
               {!loading && (
                 user ? (
                   <>
                     <Link to="/profile" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary">
-                      Profili
+                      {t('nav_profile')}
                     </Link>
                     <button onClick={() => { signOut(); setMobileOpen(false); }} className="rounded-lg px-4 py-3 text-left text-sm text-muted-foreground hover:text-foreground hover:bg-secondary">
-                      Dilni
+                      {t('nav_logout')}
                     </button>
                   </>
                 ) : (
                   <>
                     <Link to="/login" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-primary font-medium">
-                      Kyçu
+                      {t('nav_login')}
                     </Link>
                     <Link to="/signup" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-primary font-medium">
-                      Regjistrohu
+                      {t('nav_signup')}
                     </Link>
                   </>
                 )

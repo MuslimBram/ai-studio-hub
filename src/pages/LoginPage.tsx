@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import { useSEO } from '@/hooks/useSEO';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Loader2 } from 'lucide-react';
 
 export default function LoginPage() {
@@ -17,38 +18,37 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
+  const { t } = useLanguage();
 
-  useSEO({ title: 'Kyçu', description: 'Kyçuni në llogarinë tuaj në AI Tools Hub.' });
+  useSEO({ title: t('login_title'), description: t('login_title') });
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
-      toast({ title: 'Gabim', description: 'Plotësoni të gjitha fushat.', variant: 'destructive' });
+      toast({ title: t('error_title'), description: t('error_fill_all'), variant: 'destructive' });
       return;
     }
     setLoading(true);
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
-      toast({ title: 'Gabim', description: error.message, variant: 'destructive' });
+      toast({ title: t('error_title'), description: error.message, variant: 'destructive' });
       return;
     }
 
-    // Check if MFA is enrolled
     const { data: factorsData } = await supabase.auth.mfa.listFactors();
     const verifiedFactors = factorsData?.totp?.filter(f => f.status === 'verified') || [];
 
     if (verifiedFactors.length > 0) {
-      // MFA required
       setMfaFactorId(verifiedFactors[0].id);
     } else {
-      toast({ title: 'Sukses', description: 'U kyçët me sukses!' });
+      toast({ title: t('common_success'), description: t('login_success') });
       navigate('/');
     }
   };
 
   const handleMfaSuccess = () => {
-    toast({ title: 'Sukses', description: 'U kyçët me sukses!' });
+    toast({ title: t('common_success'), description: t('login_success') });
     navigate('/');
   };
 
@@ -63,33 +63,29 @@ export default function LoginPage() {
       <div className="container flex items-center justify-center py-20 flex-1">
         <div className="w-full max-w-md rounded-xl border bg-card p-8 shadow-card">
           {mfaFactorId ? (
-            <MfaChallenge
-              factorId={mfaFactorId}
-              onSuccess={handleMfaSuccess}
-              onCancel={handleMfaCancel}
-            />
+            <MfaChallenge factorId={mfaFactorId} onSuccess={handleMfaSuccess} onCancel={handleMfaCancel} />
           ) : (
             <>
-              <h1 className="mb-6 text-2xl font-bold text-foreground text-center">Kyçu</h1>
+              <h1 className="mb-6 text-2xl font-bold text-foreground text-center">{t('login_title')}</h1>
               <form onSubmit={handleLogin} className="space-y-4">
                 <div>
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@shembull.com" />
+                  <Label htmlFor="email">{t('login_email')}</Label>
+                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t('email_placeholder')} />
                 </div>
                 <div>
-                  <Label htmlFor="password">Fjalëkalimi</Label>
-                  <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
+                  <Label htmlFor="password">{t('login_password')}</Label>
+                  <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t('password_placeholder')} />
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                  Kyçu
+                  {t('login_button')}
                 </Button>
               </form>
               <div className="mt-4 flex flex-col gap-2 text-center text-sm">
-                <Link to="/forgot-password" className="text-primary hover:underline">Keni harruar fjalëkalimin?</Link>
+                <Link to="/forgot-password" className="text-primary hover:underline">{t('login_forgot')}</Link>
                 <span className="text-muted-foreground">
-                  Nuk keni llogari?{' '}
-                  <Link to="/signup" className="text-primary hover:underline">Regjistrohu</Link>
+                  {t('login_no_account')}{' '}
+                  <Link to="/signup" className="text-primary hover:underline">{t('nav_signup')}</Link>
                 </span>
               </div>
             </>
