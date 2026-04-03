@@ -60,11 +60,7 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
   }, [search]);
 
   const handleSelectChannel = (ch: ChannelDefinition) => {
-    const status = getStatus(ch.platform);
-    if (status === "connected") {
-      toast.info(`${ch.name} është tashmë e lidhur.`);
-      return;
-    }
+    // Multi-account: always allow adding more accounts
     setSelectedChannel(ch);
     setSelectedMode(null);
 
