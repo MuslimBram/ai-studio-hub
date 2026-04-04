@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_tools: {
+        Row: {
+          category: string
+          click_count: number
+          created_at: string
+          description: string
+          id: string
+          is_featured: boolean
+          is_free: boolean
+          logo_url: string
+          name: string
+          subcategory: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          category?: string
+          click_count?: number
+          created_at?: string
+          description?: string
+          id?: string
+          is_featured?: boolean
+          is_free?: boolean
+          logo_url?: string
+          name?: string
+          subcategory?: string
+          updated_at?: string
+          url?: string
+        }
+        Update: {
+          category?: string
+          click_count?: number
+          created_at?: string
+          description?: string
+          id?: string
+          is_featured?: boolean
+          is_free?: boolean
+          logo_url?: string
+          name?: string
+          subcategory?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
       ai_usage_logs: {
         Row: {
           action_type: string

@@ -24,6 +24,7 @@ import AdminCategories from "./pages/admin/AdminCategories";
 import AdminDonations from "./pages/admin/AdminDonations";
 import AdminUsers from "./pages/admin/AdminUsers";
 import OAuthCallbackPage from "./pages/OAuthCallbackPage";
+import AiToolsPage from "./pages/AiToolsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -49,6 +50,7 @@ const App = () => (
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/donate" element={<DonatePage />} />
             <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
+            <Route path="/ai-tools" element={<AiToolsPage />} />
             <Route path="/content-engine" element={<MfaGuard><ContentEnginePage /></MfaGuard>} />
 
             {/* Protected routes — require 2FA */}
