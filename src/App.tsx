@@ -50,6 +50,7 @@ const App = () => (
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/donate" element={<DonatePage />} />
             <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
+            <Route path="/ai-tools" element={<AiToolsPage />} />
             <Route path="/content-engine" element={<MfaGuard><ContentEnginePage /></MfaGuard>} />
 
             {/* Protected routes — require 2FA */}
