@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ChannelCard, type ChannelStatus } from "./ChannelCard";
+import { ChannelCard, RequestChannelCard, type ChannelStatus } from "./ChannelCard";
 import { channels, type ChannelDefinition, type ModeDefinition, hasMultipleModes } from "./channels-config";
 import { ModeComparisonStep } from "./ModeComparisonStep";
 import { CredentialsStep } from "./CredentialsStep";
