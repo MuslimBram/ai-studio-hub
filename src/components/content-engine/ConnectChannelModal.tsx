@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ChannelCard, type ChannelStatus } from "./ChannelCard";
+import { ChannelCard, RequestChannelCard, type ChannelStatus } from "./ChannelCard";
 import { channels, type ChannelDefinition, type ModeDefinition, hasMultipleModes } from "./channels-config";
 import { ModeComparisonStep } from "./ModeComparisonStep";
 import { CredentialsStep } from "./CredentialsStep";
@@ -219,6 +219,9 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
                     onClick={() => handleSelectChannel(ch)}
                   />
                 ))}
+                {!search.trim() && (
+                  <RequestChannelCard onClick={() => toast.info("Na kontakto për të shtuar kanale të reja!")} />
+                )}
               </div>
               {filteredChannels.length === 0 && (
                 <div className="py-12 text-center text-muted-foreground">
@@ -226,11 +229,6 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
                   <p className="font-medium">Nuk u gjet asnjë kanal</p>
                 </div>
               )}
-              <div className="mt-4 text-center">
-                <button className="text-xs text-muted-foreground hover:text-primary transition-colors underline underline-offset-2">
-                  Nuk e gjen kanalin? Na kontakto për ta shtuar.
-                </button>
-              </div>
             </ScrollArea>
           </div>
         )}
