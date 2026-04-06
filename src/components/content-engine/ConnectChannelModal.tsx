@@ -219,6 +219,9 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
                     onClick={() => handleSelectChannel(ch)}
                   />
                 ))}
+                {!search.trim() && (
+                  <RequestChannelCard onClick={() => toast.info("Na kontakto për të shtuar kanale të reja!")} />
+                )}
               </div>
               {filteredChannels.length === 0 && (
                 <div className="py-12 text-center text-muted-foreground">
@@ -226,11 +229,6 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
                   <p className="font-medium">Nuk u gjet asnjë kanal</p>
                 </div>
               )}
-              <div className="mt-4 text-center">
-                <button className="text-xs text-muted-foreground hover:text-primary transition-colors underline underline-offset-2">
-                  Nuk e gjen kanalin? Na kontakto për ta shtuar.
-                </button>
-              </div>
             </ScrollArea>
           </div>
         )}
