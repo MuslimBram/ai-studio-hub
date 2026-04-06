@@ -86,10 +86,10 @@ export const channels: ChannelDefinition[] = [
       },
       {
         mode: "personal",
-        label: "Personal",
+        label: "Personal (Instagram Login API)",
         description:
-          "Vetëm njoftime & publikim manual. Auto-posting nuk mbështetet për llogari personale.",
-        capabilities: ["manual_post", "notifications"],
+          "Lidhu direkt me Instagram pa Facebook Page. Publikim automatik, analitika, komente. Përdor Instagram Login API v3.",
+        capabilities: ["auto_post", "scheduling", "analytics", "comments", "notifications"],
         accountTypes: ["personal"],
         connectionMethod: "oauth",
       },
