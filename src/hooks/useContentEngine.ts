@@ -116,7 +116,7 @@ export function useUpdateScheduledPost() {
     mutationFn: async ({ id, ...updates }: { id: string; [key: string]: any }) => {
       const { data, error } = await supabase
         .from("scheduled_posts")
-        .update(updates)
+        .update(updates as any)
         .eq("id", id)
         .select()
         .single();
