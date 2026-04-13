@@ -60,6 +60,7 @@ export default function OAuthCallbackPage() {
         functionName = `${platform}-oauth`;
       }
 
+      const fnUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${functionName}?action=callback`;
       const res = await fetch(fnUrl, {
         method: "POST",
         headers: {
