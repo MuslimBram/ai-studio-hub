@@ -103,7 +103,7 @@ export const channels: ChannelDefinition[] = [
     subtitle: "Profile",
     icon: AtSign,
     iconColor: "text-foreground",
-    supported: false,
+    supported: true,
     modes: [
       {
         mode: "professional",
@@ -180,7 +180,7 @@ export const channels: ChannelDefinition[] = [
     subtitle: "Profile",
     icon: Globe,
     iconColor: "text-sky-500",
-    supported: false,
+    supported: true,
     modes: [
       {
         mode: "professional",
@@ -199,7 +199,7 @@ export const channels: ChannelDefinition[] = [
     subtitle: "Channel",
     icon: Youtube,
     iconColor: "text-red-600",
-    supported: false,
+    supported: true,
     modes: [
       {
         mode: "professional",
@@ -218,7 +218,7 @@ export const channels: ChannelDefinition[] = [
     subtitle: "Business or Creator",
     icon: Music2,
     iconColor: "text-foreground",
-    supported: false,
+    supported: true,
     modes: [
       {
         mode: "professional",
@@ -237,7 +237,7 @@ export const channels: ChannelDefinition[] = [
     subtitle: "Profile",
     icon: Globe,
     iconColor: "text-purple-500",
-    supported: false,
+    supported: true,
     modes: [
       {
         mode: "professional",
@@ -256,7 +256,7 @@ export const channels: ChannelDefinition[] = [
     subtitle: "Business or Profile",
     icon: Globe,
     iconColor: "text-red-500",
-    supported: false,
+    supported: true,
     modes: [
       {
         mode: "professional",
@@ -275,7 +275,7 @@ export const channels: ChannelDefinition[] = [
     subtitle: "Profile",
     icon: Building2,
     iconColor: "text-green-600",
-    supported: false,
+    supported: true,
     modes: [
       {
         mode: "professional",
@@ -294,7 +294,7 @@ export const channels: ChannelDefinition[] = [
     subtitle: "Profile",
     icon: Twitter,
     iconColor: "text-foreground",
-    supported: false,
+    supported: true,
     modes: [
       {
         mode: "professional",

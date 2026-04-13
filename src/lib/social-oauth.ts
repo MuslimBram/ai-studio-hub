@@ -29,6 +29,33 @@ export function openOAuthPopup(channelName: string) {
   return popup;
 }
 
+/**
+ * Map platform to edge function name.
+ * Platforms that route through the same Meta Business Login use "meta-oauth".
+ * Each platform with its own OAuth app gets its own edge function.
+ */
+function resolveOAuthFunction(platform: string): string {
+  switch (platform) {
+    case "facebook":
+    case "instagram":
+    case "threads":
+      return "meta-oauth";
+    case "linkedin":
+      return "linkedin-oauth";
+    // Future platform-specific edge functions:
+    case "twitter":
+    case "youtube":
+    case "tiktok":
+    case "pinterest":
+    case "google_business":
+    case "mastodon":
+    case "bluesky":
+      return `${platform}-oauth`;
+    default:
+      return "meta-oauth";
+  }
+}
+
 export async function startSocialOAuth({
   channel,
   mode,
@@ -39,19 +66,14 @@ export async function startSocialOAuth({
   popup?: Window | null;
 }) {
   const redirectUri = `${window.location.origin}/oauth/callback`;
+  const functionName = resolveOAuthFunction(channel.platform);
 
-  let functionName = "meta-oauth";
-  let bodyPayload: Record<string, string> = {
+  const bodyPayload: Record<string, string> = {
     redirectUri,
     platform: channel.platform,
     accountType: mode.accountTypes[0] || "professional",
     connectionMode: mode.mode,
   };
-
-  if (channel.platform === "linkedin") {
-    functionName = "linkedin-oauth";
-    bodyPayload = { redirectUri, connectionMode: mode.mode };
-  }
 
   const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${functionName}?action=authorize`, {
     method: "POST",
