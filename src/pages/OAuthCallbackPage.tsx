@@ -50,8 +50,15 @@ export default function OAuthCallbackPage() {
         platform = stateData.platform || "facebook";
       } catch {}
 
-      const functionName = platform === "linkedin" ? "linkedin-oauth" : "meta-oauth";
-      const fnUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${functionName}?action=callback`;
+      // Route to the correct edge function
+      let functionName: string;
+      if (["facebook", "instagram", "threads"].includes(platform)) {
+        functionName = "meta-oauth";
+      } else if (platform === "linkedin") {
+        functionName = "linkedin-oauth";
+      } else {
+        functionName = `${platform}-oauth`;
+      }
 
       const res = await fetch(fnUrl, {
         method: "POST",
