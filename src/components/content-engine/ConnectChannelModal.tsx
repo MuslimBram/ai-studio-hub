@@ -109,17 +109,49 @@ export function ConnectChannelModal({ open, onOpenChange }: ConnectChannelModalP
   const handleCredentialConnect = async (formData: Record<string, string>) => {
     if (!selectedChannel || !selectedMode || !user) return;
 
-    const accountName = formData.account_name?.trim();
-    const accountId = formData.account_id?.trim();
-    if (!accountName || !accountId) {
-      toast.error("Plotëso të gjitha fushat.");
-      return;
-    }
-
     setConnecting(true);
     try {
-      // For credential-based channels (email, website, custom), use a sentinel token
-      // so they aren't treated as "disconnected" by cleanup logic
+      // Bluesky uses dedicated edge function
+      if (selectedChannel.platform === "bluesky") {
+        const { data, error } = await supabase.functions.invoke("bluesky-connect", {
+          body: {
+            handle: formData.handle?.trim(),
+            appPassword: formData.appPassword?.trim(),
+            service: formData.service?.trim() || undefined,
+          },
+        });
+        if (error) throw error;
+        if (data?.error) throw new Error(data.error);
+        qc.invalidateQueries({ queryKey: ["social-accounts"] });
+        toast.success(`Bluesky u lidh: @${data.accountName}`);
+        resetAndClose();
+        return;
+      }
+
+      // Mastodon uses dedicated edge function
+      if (selectedChannel.platform === "mastodon") {
+        const { data, error } = await supabase.functions.invoke("mastodon-connect", {
+          body: {
+            instanceUrl: formData.instanceUrl?.trim(),
+            accessToken: formData.accessToken?.trim(),
+          },
+        });
+        if (error) throw error;
+        if (data?.error) throw new Error(data.error);
+        qc.invalidateQueries({ queryKey: ["social-accounts"] });
+        toast.success(`Mastodon u lidh: @${data.accountName}`);
+        resetAndClose();
+        return;
+      }
+
+      // Generic credential channels (telegram, whatsapp, email, custom)
+      const accountName = formData.account_name?.trim();
+      const accountId = formData.account_id?.trim();
+      if (!accountName || !accountId) {
+        toast.error("Plotëso të gjitha fushat.");
+        return;
+      }
+
       const { error } = await supabase.from("social_accounts").insert({
         user_id: user.id,
         platform: selectedChannel.platform,

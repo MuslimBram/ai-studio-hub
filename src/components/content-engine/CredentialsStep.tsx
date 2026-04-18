@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, CheckCircle2 } from "lucide-react";
+import { Loader2, CheckCircle2, ExternalLink } from "lucide-react";
 import { type ChannelDefinition, type ModeDefinition, capabilityLabels } from "./channels-config";
 
 interface CredentialsStepProps {
@@ -13,14 +13,63 @@ interface CredentialsStepProps {
   connecting: boolean;
 }
 
-const channelFields: Record<string, { label: string; key: string; type?: string; placeholder: string }[]> = {
-  linkedin: [
-    { label: "Emri i Profilit / Kompanisë", key: "account_name", placeholder: "p.sh. Kompania Ime" },
-    { label: "LinkedIn ID", key: "account_id", placeholder: "LinkedIn Organization ID" },
+interface FieldDef {
+  label: string;
+  key: string;
+  type?: string;
+  placeholder: string;
+  helpText?: string;
+  helpUrl?: string;
+}
+
+const channelFields: Record<string, FieldDef[]> = {
+  bluesky: [
+    {
+      label: "Handle",
+      key: "handle",
+      placeholder: "p.sh. username.bsky.social",
+      helpText: "Handle-i yt i plotë në Bluesky.",
+    },
+    {
+      label: "App Password",
+      key: "appPassword",
+      type: "password",
+      placeholder: "xxxx-xxxx-xxxx-xxxx",
+      helpText: "Krijo një App Password në Bluesky → Settings → App Passwords. Mos përdor fjalëkalimin kryesor.",
+      helpUrl: "https://bsky.app/settings/app-passwords",
+    },
+    {
+      label: "PDS Service (opsionale)",
+      key: "service",
+      placeholder: "https://bsky.social",
+      helpText: "Lëre bosh nëse përdor bsky.social standard.",
+    },
+  ],
+  mastodon: [
+    {
+      label: "Instance URL",
+      key: "instanceUrl",
+      placeholder: "p.sh. mastodon.social",
+      helpText: "URL-ja e instancës tënde Mastodon (pa https://).",
+    },
+    {
+      label: "Access Token",
+      key: "accessToken",
+      type: "password",
+      placeholder: "Bearer token nga aplikacioni yt",
+      helpText: "Krijo një aplikacion në Settings → Development → New Application me scope: read, write.",
+      helpUrl: "https://docs.joinmastodon.org/client/token/",
+    },
   ],
   telegram: [
     { label: "Emri i Botit", key: "account_name", placeholder: "p.sh. MyBot" },
-    { label: "Bot Token", key: "account_id", placeholder: "123456:ABC-DEF..." },
+    {
+      label: "Bot Token",
+      key: "account_id",
+      type: "password",
+      placeholder: "123456:ABC-DEF...",
+      helpText: "Merr token-in nga @BotFather në Telegram.",
+    },
   ],
   whatsapp: [
     { label: "Numri i Biznesit", key: "account_name", placeholder: "+355..." },
@@ -41,9 +90,11 @@ export function CredentialsStep({ channel, selectedMode, onConnect, connecting }
   const Icon = channel.icon;
   const fields = channelFields[channel.platform] || channelFields.custom;
 
+  const requiredKeys = fields.filter((f) => !f.label.includes("opsionale")).map((f) => f.key);
+  const isValid = requiredKeys.every((k) => (formData[k] || "").trim().length > 0);
+
   return (
     <div className="space-y-5 px-6 py-6">
-      {/* Channel + mode header */}
       <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/50 border">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-background">
           <Icon className={`h-5 w-5 ${channel.iconColor}`} />
@@ -57,7 +108,6 @@ export function CredentialsStep({ channel, selectedMode, onConnect, connecting }
         </Badge>
       </div>
 
-      {/* Capabilities summary */}
       <div className="flex flex-wrap gap-1.5">
         {selectedMode.capabilities.map((cap) => (
           <Badge key={cap} variant="secondary" className="text-[10px]">
@@ -66,7 +116,6 @@ export function CredentialsStep({ channel, selectedMode, onConnect, connecting }
         ))}
       </div>
 
-      {/* Credential fields */}
       {fields.map((field) => (
         <div key={field.key} className="space-y-2">
           <Label htmlFor={field.key}>{field.label}</Label>
@@ -77,11 +126,27 @@ export function CredentialsStep({ channel, selectedMode, onConnect, connecting }
             value={formData[field.key] || ""}
             onChange={(e) => setFormData((prev) => ({ ...prev, [field.key]: e.target.value }))}
             disabled={connecting}
+            autoComplete="off"
           />
+          {field.helpText && (
+            <p className="text-xs text-muted-foreground flex items-start gap-1">
+              <span>{field.helpText}</span>
+              {field.helpUrl && (
+                <a
+                  href={field.helpUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-0.5 text-primary hover:underline shrink-0"
+                >
+                  Më shumë <ExternalLink className="h-3 w-3" />
+                </a>
+              )}
+            </p>
+          )}
         </div>
       ))}
 
-      <Button onClick={() => onConnect(formData)} disabled={connecting} className="w-full" size="lg">
+      <Button onClick={() => onConnect(formData)} disabled={connecting || !isValid} className="w-full" size="lg">
         {connecting ? (
           <>
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
