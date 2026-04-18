@@ -42,17 +42,18 @@ function resolveOAuthFunction(platform: string): string {
       return "meta-oauth";
     case "linkedin":
       return "linkedin-oauth";
-    // Future platform-specific edge functions:
     case "twitter":
+      return "twitter-oauth";
     case "youtube":
+      return "youtube-oauth";
     case "tiktok":
+      return "tiktok-oauth";
     case "pinterest":
+      return "pinterest-oauth";
     case "google_business":
-    case "mastodon":
-    case "bluesky":
-      return `${platform}-oauth`;
+      return "google_business-oauth";
     default:
-      return "meta-oauth";
+      return `${platform}-oauth`;
   }
 }
 
