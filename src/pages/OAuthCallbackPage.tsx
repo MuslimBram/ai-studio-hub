@@ -56,6 +56,8 @@ export default function OAuthCallbackPage() {
         functionName = "meta-oauth";
       } else if (platform === "linkedin") {
         functionName = "linkedin-oauth";
+      } else if (["twitter", "youtube", "tiktok", "pinterest", "google_business"].includes(platform)) {
+        functionName = `${platform}-oauth`;
       } else {
         functionName = `${platform}-oauth`;
       }
