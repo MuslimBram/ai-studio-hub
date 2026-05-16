@@ -1,0 +1,25 @@
+# AI Tools Hub
+
+> Direktoria më e plotë e mjeteve AI në gjuhën shqipe — eksploro, krahaso dhe provo qindra mjete inteligjence artificiale për foto, video, audio, tekst, lojra dhe biznes.
+
+AI Tools Hub është një platformë falas që organizon mbi 100 mjete AI në 20 kategori, me një Content Engine të integruar për krijim përmbajtjeje, planifikim postimesh dhe analitikë multi-kanal.
+
+## Pages
+
+- [Home](/): Kërko dhe eksploro mjetet AI sipas kategorisë.
+- [AI Tools](/ai-tools): Lista e plotë e mjeteve AI të disponueshme.
+- [Content Engine](/content-engine): Krijim përmbajtjeje, planifikim postimesh, analitikë.
+- [Donate](/donate): Mbështet platformën përmes PayPal.
+- [Login](/login): Hyr në llogarinë tënde.
+- [Signup](/signup): Krijo një llogari të re.
+
+## Categories
+
+- [Image](/tools/image): Mjete AI për gjenerim dhe editim imazhesh.
+- [Video](/tools/video): Mjete AI për video.
+- [Audio](/tools/audio): Mjete AI për audio, muzikë dhe zë.
+- [Text](/tools/text): Mjete AI për tekst dhe shkrim.
+- [Coding](/tools/coding): Asistentë AI për programim.
+- [Business](/tools/business): Mjete AI për biznes.
+- [Design](/tools/design): Mjete AI për dizajn.
+- [Marketing](/tools/marketing): Mjete AI për marketing.
