@@ -27,7 +27,25 @@ export default function ToolPage() {
     official: { label: t('badge_official'), icon: <Shield className="h-3 w-3" /> },
   };
 
-  useSEO({ title: tool?.title, description: tool?.shortDescription });
+  useSEO({
+    title: tool?.title,
+    description: tool?.shortDescription,
+    jsonLd: tool ? {
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      name: tool.title,
+      description: tool.shortDescription,
+      applicationCategory: tool.modelType || 'AIApplication',
+      operatingSystem: 'Web',
+      url: `https://hubinai.lovable.app/tool/${tool.slug}`,
+      offers: {
+        '@type': 'Offer',
+        price: tool.pricingType === 'free' ? '0' : undefined,
+        priceCurrency: 'EUR',
+      },
+      provider: { '@type': 'Organization', name: tool.provider },
+    } : undefined,
+  });
 
   const websiteUrl = (tool as any)?.website_url || '';
 

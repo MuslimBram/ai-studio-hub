@@ -36,6 +36,22 @@ export default function SubcategoryPage() {
   useSEO({
     title: subcategory ? `${subcategory.name} — ${category?.name}` : undefined,
     description: subcategory?.description || undefined,
+    jsonLd: subcategory && category ? {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: `${subcategory.name} — ${category.name}`,
+      description: subcategory.description || undefined,
+      url: `https://hubinai.lovable.app/tools/${category.slug}/${subcategory.slug}`,
+      mainEntity: {
+        '@type': 'ItemList',
+        itemListElement: filteredTools.slice(0, 25).map((t, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          url: `https://hubinai.lovable.app/tool/${t.slug}`,
+          name: t.title,
+        })),
+      },
+    } : undefined,
   });
 
   if (isLoading) {
