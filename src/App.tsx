@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { MfaGuard } from "@/components/MfaGuard";
 import { ForceLogoutProvider } from "@/components/ForceLogoutProvider";
+import PwaInstallPrompt from "@/components/PwaInstallPrompt";
 import Index from "./pages/Index";
 import CategoryPage from "./pages/CategoryPage";
 import SubcategoryPage from "./pages/SubcategoryPage";
@@ -38,6 +39,7 @@ const App = () => (
         <LanguageProvider>
         <AuthProvider>
           <ForceLogoutProvider />
+          <PwaInstallPrompt />
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<Index />} />
